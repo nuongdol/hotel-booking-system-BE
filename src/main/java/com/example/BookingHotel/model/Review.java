@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Data
 @Table(name = "review")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity
 public class Review {
 
     @Id

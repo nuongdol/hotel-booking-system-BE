@@ -28,6 +28,7 @@ public class Room {
     @Column(name = "room_price")
     private BigDecimal roomPrice;
 
+    //status = true: booked, false: unbooked
     @Column(name = "is_booked")
     private boolean isBooked = false;
 

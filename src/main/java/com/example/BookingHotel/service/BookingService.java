@@ -40,13 +40,13 @@ public class BookingService implements IBookingService{
     public String saveBooking(Long roomId, BookedRoom bookingRequest) {
         if(bookingRequest.getCheckOutDate().isBefore(bookingRequest.getCheckInDate())){
             throw new InvalidBookingRequestException("Check-in date must come before check-out date.");
-
         }
-
         Room room = roomService.getRoomById(roomId).get();
         List<BookedRoom> existingBookings = room.getBookings();
         boolean roomIsAvailable = roomIsAvailable(bookingRequest, existingBookings);
         if(roomIsAvailable){
+            //nếu phòng available rồi thì xét những trường hợp concurrency
+            roomService.processBookingRoom(roomId);
             room.addBooking(bookingRequest);
             bookingRepository.save(bookingRequest);
         }else{

@@ -47,7 +47,7 @@ public class BookingController {
     }
     //luu thong tin dat phong
     @PostMapping("/room/{roomId}/booking")
-    public ResponseEntity<?> saveBooking(@PathVariable("roomId") Long roomId,@RequestBody BookedRoom bookingRequest){
+    public ResponseEntity<?> saveBooking(@PathVariable("roomId") Long roomId, @RequestBody BookedRoom bookingRequest){
         try{
             String confirmationCode = bookingService.saveBooking(roomId, bookingRequest);
             return ResponseEntity.ok("Room booked successfully, Your booking confirmation code is:"
@@ -56,6 +56,7 @@ public class BookingController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     @DeleteMapping("/booking/{bookingId}/delete")
     public void cancelBooking(@PathVariable ("bookingId") Long bookingId){
         bookingService.cancelBooking(bookingId);

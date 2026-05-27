@@ -48,7 +48,7 @@ public class User {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "member_level_id")
+    @Column(name = "member_level_id", insertable = false, updatable = false)
     private Long memberLevelId;
     //ta khai báo một đối tượng MemberLevel(Định nghĩa trong users)
     @ManyToOne(fetch = FetchType.LAZY)//member.getMemberLevel()

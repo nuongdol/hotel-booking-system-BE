@@ -26,7 +26,7 @@ public class PaymentController {
                                             @RequestBody Payment payment){
         try{
            if(bookingId == payment.getBooking().getBookingId()){
-               paymentService.postPayment(payment.getId(), payment.getBooking(), payment.getUserEmail(),
+               paymentService.postPayment(payment.getPaymentId(), payment.getBooking(), payment.getUserEmail(),
                        payment.getPaymentMethod(), payment.getPaymentAccount(), payment.getPaymentStatus()
                ,payment.getTimestamp());
                return ResponseEntity.ok("Pay successfully");
@@ -41,7 +41,7 @@ public class PaymentController {
     @GetMapping("/hotel/payments/{id}")
     public ResponseEntity<?> getPayment(@PathVariable("id") Long idPayment){
         Optional<Payment> payment = paymentService.getPayment(idPayment);
-        PaymentResponse paymentResponse = new PaymentResponse(payment.get().getId(), payment.get().getBooking(),
+        PaymentResponse paymentResponse = new PaymentResponse(payment.get().getPaymentId(), payment.get().getBooking(),
                 payment.get().getUserEmail(), payment.get().getPaymentMethod(),payment.get().getPaymentAccount(),
                 payment.get().getPaymentStatus(),payment.get().getTimestamp());
 
@@ -52,8 +52,8 @@ public class PaymentController {
     @PutMapping("/hotel/payments/{id}/payed")
     public ResponseEntity<?> updatePayment(@PathVariable Long id, @RequestBody Payment payment){
         try{
-            if(id == payment.getId()){
-                paymentService.updatePayment(payment.getId(),payment.getUserEmail(),
+            if(id == payment.getPaymentId()){
+                paymentService.updatePayment(payment.getPaymentId(),payment.getUserEmail(),
                         payment.getPaymentMethod(), payment.getPaymentAccount(), payment.getPaymentStatus(), payment.getTimestamp());
                 return ResponseEntity.ok("Update Pay successfully");
             }
