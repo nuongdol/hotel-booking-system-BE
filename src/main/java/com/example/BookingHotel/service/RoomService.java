@@ -3,6 +3,7 @@ package com.example.BookingHotel.service;
 import com.example.BookingHotel.exception.InternalServerException;
 import com.example.BookingHotel.exception.ResourceNotFoundException;
 import com.example.BookingHotel.model.Room;
+import com.example.BookingHotel.repository.RoomInventoryRepository;
 import com.example.BookingHotel.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
@@ -26,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 public class RoomService implements IRoomService {
 
     private final RoomRepository roomRepository;
-    private final RedissonClient redisson;
 
     //add new a room
     @Override
@@ -34,7 +34,7 @@ public class RoomService implements IRoomService {
         Room room = new Room();
         room.setRoomType(roomType);
         room.setRoomPrice(roomPrice);
-        if(!file.isEmpty()){
+        if (!file.isEmpty()) {
             byte[] photoBytes = file.getBytes();
             Blob photoBlob = new SerialBlob(photoBytes);//SerialBlob convert byte to blob
             room.setPhoto(photoBlob);
@@ -42,7 +42,8 @@ public class RoomService implements IRoomService {
         }
         return roomRepository.save(room);
     }
-//lấy loại phòng khác nhau
+
+    //lấy loại phòng khác nhau
     @Override
     public List<String> getAllRoomTypes() {
         return roomRepository.findDistinctRoomTypes();//ham nay dung de chi su khac biet
@@ -57,13 +58,13 @@ public class RoomService implements IRoomService {
     public byte[] getRoomPhotoByRoomId(Long roomId) throws SQLException {
         //xem phong co ton tai hay khong dieu kien lay anh va chuyen doi
         Optional<Room> theRoom = roomRepository.findById(roomId);
-        if(theRoom.isEmpty()){
+        if (theRoom.isEmpty()) {
             throw new ResourceNotFoundException("Sorry, Room not found.");
         }
         Blob photoBlob = theRoom.get().getPhoto();
-        if(photoBlob != null){
-            return photoBlob.getBytes(1,(int)photoBlob.length());
-        }else{
+        if (photoBlob != null) {
+            return photoBlob.getBytes(1, (int) photoBlob.length());
+        } else {
             return null;
         }
 
@@ -72,7 +73,7 @@ public class RoomService implements IRoomService {
     @Override
     public void deleteRoom(Long roomId) {
         Optional<Room> theRoom = roomRepository.findById(roomId);
-        if(theRoom.isPresent()){
+        if (theRoom.isPresent()) {
             roomRepository.deleteById(roomId);
         }
     }
@@ -81,16 +82,16 @@ public class RoomService implements IRoomService {
     public Room updateRoom(Long roomId, String roomType, BigDecimal roomPrice, byte[] photoBytes) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
-        if(roomType != null){
+        if (roomType != null) {
             room.setRoomType(roomType);
         }
-        if(roomPrice != null){
+        if (roomPrice != null) {
             room.setRoomPrice(roomPrice);
         }
-        if(photoBytes != null && photoBytes.length > 0){
-            try{
+        if (photoBytes != null && photoBytes.length > 0) {
+            try {
                 room.setPhoto(new SerialBlob(photoBytes));
-            }catch (SQLException ex){
+            } catch (SQLException ex) {
                 throw new InternalServerException("Error updating room.");
             }
 
@@ -105,20 +106,6 @@ public class RoomService implements IRoomService {
 
     @Override
     public List<Room> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, String roomType) {
-        return roomRepository.findAvailableRoomsByDatesAndType(checkInDate,checkOutDate,roomType);
-    }
-
-    @Override
-    public void processBookingRoom(Long roomId) {
-        // redis lock chặn các request thừa từ ngoài vào
-        LocalDateTime date = LocalDateTime.now();
-        RLock lock = redisson.getLock("lock:room:" + roomId +":" + date);
-        try{
-            //đợi 3s và giải phóng sau 10s
-            if(lock.tryLock(3, 10, TimeUnit.SECONDS)){
-                int updatedRows =
-            }
-        }
-
+        return roomRepository.findAvailableRoomsByDatesAndType(checkInDate, checkOutDate, roomType);
     }
 }

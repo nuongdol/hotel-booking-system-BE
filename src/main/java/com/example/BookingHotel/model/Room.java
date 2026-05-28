@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
+
 @Entity
 @Setter
 @Getter
@@ -54,8 +55,9 @@ public class Room {
         this.bookings = new ArrayList<>();
         //khoi tao danh sach dat phong
     }
-    public void addBooking(BookedRoom booking){
-        if(bookings == null){
+
+    public void addBooking(BookedRoom booking) {
+        if (bookings == null) {
             bookings = new ArrayList<>();
         }
         bookings.add(booking);//arrayList có hàm add

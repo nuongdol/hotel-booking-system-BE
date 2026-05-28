@@ -15,6 +15,7 @@ import java.util.List;
 public class BookingService implements IBookingService{
     private final BookingRepository bookingRepository;
     private final IRoomService roomService;
+    private final IRoomInventoryService roomInventoryService;
 
     @Override
     public List<BookedRoom> getAllBookings() {
@@ -46,9 +47,12 @@ public class BookingService implements IBookingService{
         boolean roomIsAvailable = roomIsAvailable(bookingRequest, existingBookings);
         if(roomIsAvailable){
             //nếu phòng available rồi thì xét những trường hợp concurrency
-            roomService.processBookingRoom(roomId);
-            room.addBooking(bookingRequest);
-            bookingRepository.save(bookingRequest);
+            int updateRows = roomInventoryService.processBookingRoom(roomId);
+            //optimistic locking
+            if(updateRows == 1){
+                room.addBooking(bookingRequest);
+                bookingRepository.save(bookingRequest);
+            }
         }else{
             throw new InvalidBookingRequestException("Sorry,this room is not available for the selected dates.");
         }

@@ -15,8 +15,10 @@ import java.util.Set;
 public class City {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "city_id")
     private Long cityId;
-    @Column(name="city")
+
+    @Column(name="name_city")
     private String nameCity;
     //1-n
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
