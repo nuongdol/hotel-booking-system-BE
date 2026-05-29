@@ -86,6 +86,9 @@ public class BookedRoom {
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
     private Review review;
 
+    @Column(name = "expired_at")
+    private LocalDateTime expiredAt;
+
     public void calculateTotalNumberOfGuest(){
 
         this.totalNumOfGuest = this.NumOfAdults + this.NumOfChildren;

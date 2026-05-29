@@ -5,6 +5,7 @@ import com.example.BookingHotel.exception.ResourceNotFoundException;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.repository.BookingRepository;
+import com.example.BookingHotel.response.HoleRoom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,12 @@ public class BookingService implements IBookingService{
     @Override
     public List<BookedRoom> getBookingsByUserEmail(String email) {
         return bookingRepository.findByGuestEmail(email);
+    }
+
+    @Override
+    public HoleRoom holdRoom(Long roomId, Long userId) {
+
+        return null;
     }
 
     public List<BookedRoom> getAllBookingsByRoomId(Long roomId) {
