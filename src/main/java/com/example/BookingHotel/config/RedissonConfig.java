@@ -13,7 +13,6 @@ public class RedissonConfig {
         Config config = new Config();
         // Cấu hình kết nối tới Redis (mặc định là localhost:6379)
         config.useSingleServer().setAddress("redis://127.0.0.1:6379");
-
         return Redisson.create(config);
     }
 }
