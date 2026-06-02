@@ -4,7 +4,6 @@ import com.example.BookingHotel.exception.PhotoRetrievalException;
 import com.example.BookingHotel.exception.ResourceNotFoundException;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
-import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.RoomResponse;
 import com.example.BookingHotel.service.BookingService;
 import com.example.BookingHotel.service.IRoomService;

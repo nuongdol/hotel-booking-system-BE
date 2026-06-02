@@ -1,5 +1,7 @@
 package com.example.BookingHotel.service;
 
+import com.example.BookingHotel.exception.BaseHotelException;
+import com.example.BookingHotel.exception.HotelGlobalExceptionHandler;
 import com.example.BookingHotel.exception.InvalidBookingRequestException;
 import com.example.BookingHotel.exception.ResourceNotFoundException;
 import com.example.BookingHotel.model.BookedRoom;
@@ -7,8 +9,10 @@ import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.repository.BookingRepository;
 import com.example.BookingHotel.response.HoleRoom;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -17,6 +21,9 @@ public class BookingService implements IBookingService{
     private final BookingRepository bookingRepository;
     private final IRoomService roomService;
     private final IRoomInventoryService roomInventoryService;
+    private final StringRedisTemplate redisTemplate;
+    private static final String HOLD_PREFIX = "room:hold:";
+    private final HotelGlobalExceptionHandler hotelGlobalExceptionHandler;
 
     @Override
     public List<BookedRoom> getAllBookings() {
@@ -30,7 +37,18 @@ public class BookingService implements IBookingService{
 
     @Override
     public HoleRoom holdRoom(Long roomId, Long userId) {
+        String key = HOLD_PREFIX + roomId;
+        //dùng set NX (ko tồn tại moi set ) và EX (hết hạn trong 15')
+        Boolean success = redisTemplate.opsForValue().setIfAbsent(key, String.valueOf(userId),
+                Duration.ofMillis(15));
+        if(Boolean.TRUE.equals(success)){
+            //lưu trạng thái vào booking table
+            BookedRoom booking = bookingRepository.findByRoomIdAndUserId(roomId, userId);
+            booking.setStatus(1);//pending
+            booking.setRoom(new Room());
+        }else{
 
+        }
         return null;
     }
 
