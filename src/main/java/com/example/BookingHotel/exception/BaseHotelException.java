@@ -1,32 +1,22 @@
 package com.example.BookingHotel.exception;
 
 
-import org.springframework.http.HttpStatus;
+import com.example.BookingHotel.Enum.ErrorCode;
 
 
 public class BaseHotelException extends RuntimeException{
-    private String errorCode;
-    private HttpStatus status;
+    private ErrorCode errorCode;
 
-    public BaseHotelException(String message, String errorCode, HttpStatus status){
-        super(message);
+    public BaseHotelException(ErrorCode errorCode){
+        super(errorCode.getMessage());
         this.errorCode = errorCode;
-        this.status = status;
     }
 
-    public String getErrorCode() {
+    public ErrorCode getErrorCode() {
         return errorCode;
     }
 
-    public HttpStatus getStatus() {
-        return status;
-    }
-
-    public void setErrorCode(String errorCode) {
+    public void setErrorCode(ErrorCode errorCode) {
         this.errorCode = errorCode;
-    }
-
-    public void setStatus(HttpStatus status) {
-        this.status = status;
     }
 }

@@ -1,5 +1,7 @@
 package com.example.BookingHotel.exception;
 
+import com.example.BookingHotel.Enum.ErrorCode;
+import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,19 +17,30 @@ public class HotelGlobalExceptionHandler {
 
     //xử lý lỗi validate dữ liệu
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage()));
-        ErrorResponse response = new ErrorResponse("VALIDATION_ERROR", "Data invalided!", errors);
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiResponse> handleValidation(MethodArgumentNotValidException ex) {
+        ApiResponse apiResponse = new ApiResponse<>();
+        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
+        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+        return ResponseEntity.badRequest().body(apiResponse);
     }
 
     //xử lý lỗi nghiệp vụ tuỳ chỉnh
+    @ExceptionHandler(BaseHotelException.class)
+    public ResponseEntity<ApiResponse> handleHotelBusiness(BaseHotelException ex) {
+        ErrorCode error = ex.getErrorCode();
+        ApiResponse apiResponse = new ApiResponse<>();
+        apiResponse.setCode(error.getCode());
+        apiResponse.setMessage(error.getMessage());
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
+
+    //lỗi hệ thống
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleHotelBusiness(BaseHotelException ex) {
-        ErrorResponse response = new ErrorResponse(ex.getErrorCode(), ex.getMessage());
-        return new ResponseEntity<>(response, ex.getStatus());
+    public ResponseEntity<ApiResponse> handleGeneralException(Exception ex) {
+        ApiResponse apiResponse = new ApiResponse<>();
+        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
+        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
     }
 
     //xử lý lỗi không xác định(Internal Server Error)
