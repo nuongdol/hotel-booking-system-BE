@@ -26,7 +26,8 @@ public enum ErrorCode {
     OAUTH2_AUTHENTICATION_PROCESSING(1013, "Sorry! Login google is not supported yet.",
                                      HttpStatus.BAD_REQUEST),
     EMAIL_OAUTH2_AUTHENTICATION_PROCESSING(1014, "Email not found from OAuth2 provider",
-                                           HttpStatus.BAD_REQUEST)
+                                           HttpStatus.BAD_REQUEST),
+    PAYMENT_PROCESSING(1015, "Payment method is not existed.", HttpStatus.BAD_REQUEST)
             ;
     private Integer code;
     private String message;

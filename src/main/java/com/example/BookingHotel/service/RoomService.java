@@ -3,11 +3,8 @@ package com.example.BookingHotel.service;
 import com.example.BookingHotel.exception.InternalServerException;
 import com.example.BookingHotel.exception.ResourceNotFoundException;
 import com.example.BookingHotel.model.Room;
-import com.example.BookingHotel.repository.RoomInventoryRepository;
 import com.example.BookingHotel.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,10 +14,8 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor

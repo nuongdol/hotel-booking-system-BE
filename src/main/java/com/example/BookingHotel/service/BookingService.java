@@ -1,6 +1,5 @@
 package com.example.BookingHotel.service;
 
-import com.example.BookingHotel.exception.BaseHotelException;
 import com.example.BookingHotel.exception.HotelGlobalExceptionHandler;
 import com.example.BookingHotel.exception.InvalidBookingRequestException;
 import com.example.BookingHotel.exception.ResourceNotFoundException;

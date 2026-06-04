@@ -4,11 +4,16 @@ import com.example.BookingHotel.exception.InvalidPaymentRequestException;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Payment;
 import com.example.BookingHotel.model.User;
+import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.PaymentResponse;
+import com.example.BookingHotel.response.VNPayResponse;
 import com.example.BookingHotel.service.IPaymentService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,5 +75,14 @@ public class PaymentController {
         paymentService.deletePayment(id);
     }
 
-    //
+    //payment using vnpay
+    @GetMapping("/vn-pay")
+    public ResponseEntity<ApiResponse<VNPayResponse>> pay(HttpServletRequest request){
+        return new ResponseEntity<>(HttpStatus.OK, "Success", paymentService.createVnPayment(request));
+    }
+    @GetMapping("/vn-pay-callback")
+    public ResponseEntity<ApiResponse<VNPayResponse>> payCallBackHandler(HttpServletRequest request){
+       return null;
+    }
+
 }
