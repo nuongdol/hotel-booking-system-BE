@@ -6,7 +6,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -18,10 +18,9 @@ public class RoomInventoryService implements IRoomInventoryService {
     private final RoomInventoryRepository roomInventoryRepository;
 
     @Override
-    public int processBookingRoom(Long roomId) {
+    public int processBookingRoom(Long roomId, LocalDate date) {
         int updateRows = 0;
         // redis lock chặn các request thừa từ ngoài vào
-        LocalDateTime date = LocalDateTime.now();
         RLock lock = redisson.getLock("lock:room:" + roomId + ":" + date);
         try {
             //đợi 3s và giải phóng sau 10s

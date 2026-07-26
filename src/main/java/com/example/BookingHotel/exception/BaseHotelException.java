@@ -1,7 +1,7 @@
 package com.example.BookingHotel.exception;
 
 
-import com.example.BookingHotel.Enum.ErrorCode;
+import com.example.BookingHotel.constant.ErrorCode;
 
 
 public class BaseHotelException extends RuntimeException{

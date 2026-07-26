@@ -1,16 +1,13 @@
 package com.example.BookingHotel.exception;
 
-import com.example.BookingHotel.Enum.ErrorCode;
+import com.example.BookingHotel.constant.ErrorCode;
 import com.example.BookingHotel.response.ApiResponse;
-import com.example.BookingHotel.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @ControllerAdvice
 public class HotelGlobalExceptionHandler {
@@ -44,11 +41,11 @@ public class HotelGlobalExceptionHandler {
     }
 
     //xử lý lỗi không xác định(Internal Server Error)
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleSystemError(Exception ex) {
-        //log chi tiết, admin kiểm tra
-        ErrorResponse response = new ErrorResponse("INTERNAL_SERVER_ERROR", "Error system!" +
-                "please check again! ");
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorResponse> handleSystemError(Exception ex) {
+//        //log chi tiết, admin kiểm tra
+//        ErrorResponse response = new ErrorResponse("INTERNAL_SERVER_ERROR", "Error system!" +
+//                "please check again! ");
+//        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 }

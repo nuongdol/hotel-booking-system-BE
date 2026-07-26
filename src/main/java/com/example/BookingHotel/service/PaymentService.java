@@ -1,6 +1,6 @@
 package com.example.BookingHotel.service;
 
-import com.example.BookingHotel.Enum.ErrorCode;
+import com.example.BookingHotel.constant.ErrorCode;
 import com.example.BookingHotel.annotation.PaymentType;
 import com.example.BookingHotel.exception.BaseHotelException;
 import com.example.BookingHotel.model.BookedRoom;

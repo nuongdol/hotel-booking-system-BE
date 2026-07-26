@@ -10,7 +10,10 @@ import com.example.BookingHotel.response.HoleRoom;
 import com.example.BookingHotel.response.RoomResponse;
 import com.example.BookingHotel.service.IBookingService;
 import com.example.BookingHotel.service.IRoomService;
+import com.example.BookingHotel.util.RequestUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 //@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/v1/bookings/")
 public class BookingController {
@@ -51,8 +55,13 @@ public class BookingController {
 
     //luu thong tin dat phong
     @PostMapping("/room/{roomId}/booking")
-    public ResponseEntity<?> saveBooking(@PathVariable("roomId") Long roomId, @RequestBody BookedRoom bookingRequest) {
+    public ResponseEntity<?> saveBooking(@PathVariable("roomId") Long roomId,
+                                         @RequestBody BookedRoom bookingRequest,
+                                         HttpServletRequest httpServletRequest) {
+        String ipAddress = RequestUtil.getIpAddress(httpServletRequest);
+        bookingRequest.setIpAddress(ipAddress);
         try {
+            log.info("Booking Request: {}", bookingRequest);
             String confirmationCode = bookingService.saveBooking(roomId, bookingRequest);
             return ResponseEntity.ok("Room booked successfully, Your booking confirmation code is:"
                     + confirmationCode);
@@ -76,19 +85,6 @@ public class BookingController {
             bookingResponses.add(bookingResponse);
         }
         return ResponseEntity.ok(bookingResponses);
-    }
-
-    //hold room before payment
-    @PostMapping("/{roomId}/holds")
-    public ResponseEntity<ApiResponse<HoleRoom>> holdRoom(@PathVariable(name = "roomId") Long roomId,
-                                                          @RequestParam(name = "userId") Long userId) {
-        try {
-            HoleRoom response = bookingService.holdRoom(roomId, userId);
-            return new ResponseEntity<>(new ApiResponse<>("success", 200, "Created", response), HttpStatus.CREATED);
-        } catch (Exception e) {
-            ApiResponse<HoleRoom> errorResponse = new ApiResponse<>("error", 400, e.getMessage(), null);
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        }
     }
 
     private BookingResponse getBookingResponse(BookedRoom booking) {

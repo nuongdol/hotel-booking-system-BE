@@ -89,6 +89,9 @@ public class BookedRoom {
     @Column(name = "expired_at")
     private LocalDateTime expiredAt;
 
+    @Column(name = "ip_address")
+    private String ipAddress;
+
     public void calculateTotalNumberOfGuest(){
 
         this.totalNumOfGuest = this.NumOfAdults + this.NumOfChildren;

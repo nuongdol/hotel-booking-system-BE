@@ -1,28 +1,41 @@
 package com.example.BookingHotel.service;
 
-import com.example.BookingHotel.exception.HotelGlobalExceptionHandler;
-import com.example.BookingHotel.exception.InvalidBookingRequestException;
+import com.example.BookingHotel.constant.ResponseCode;
+import com.example.BookingHotel.exception.BusinessException;
 import com.example.BookingHotel.exception.ResourceNotFoundException;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
+import com.example.BookingHotel.model.RoomInventory;
 import com.example.BookingHotel.repository.BookingRepository;
-import com.example.BookingHotel.response.HoleRoom;
+import com.example.BookingHotel.repository.RoomInventoryRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RMapCache;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-public class BookingService implements IBookingService{
+@Slf4j
+public class BookingService implements IBookingService {
     private final BookingRepository bookingRepository;
     private final IRoomService roomService;
     private final IRoomInventoryService roomInventoryService;
-    private final StringRedisTemplate redisTemplate;
     private static final String HOLD_PREFIX = "room:hold:";
-    private final HotelGlobalExceptionHandler hotelGlobalExceptionHandler;
+    private final RoomInventoryRepository roomInventoryRepository;
+    private final RedissonClient redissonClient;
+    private static final int MAX_ROOM_STOCK = 20; //so luong toi da cho moi loai phong
+    private final PriceService priceService;
 
     @Override
     public List<BookedRoom> getAllBookings() {
@@ -34,21 +47,64 @@ public class BookingService implements IBookingService{
         return bookingRepository.findByGuestEmail(email);
     }
 
-    @Override
-    public HoleRoom holdRoom(Long roomId, Long userId) {
-        String key = HOLD_PREFIX + roomId;
-        //dùng set NX (ko tồn tại moi set ) và EX (hết hạn trong 15')
-        Boolean success = redisTemplate.opsForValue().setIfAbsent(key, String.valueOf(userId),
-                Duration.ofMillis(15));
-        if(Boolean.TRUE.equals(success)){
-            //lưu trạng thái vào booking table
-            BookedRoom booking = bookingRepository.findByRoomIdAndUserId(roomId, userId);
-            booking.setStatus(1);//pending
-            booking.setRoom(new Room());
-        }else{
+    public boolean holdRoom(Long roomId, LocalDate checkIn,
+                            LocalDate checkOut, String bookingCode, Integer bookedRoom) {
+        /*
+        1. giữ phòng tạm thời cho nhiều ngày từ ngày checkIn đến ngày checkOut
+         */
+        // tạo danh sách ngày trong khoảng checkIn đến ngày checkOut của khách hàng
+        List<LocalDate> stayDates = getListDays(checkIn, checkOut);
 
+        String generalLockKey = String.format("lock:room:%d", roomId);
+        RLock lock = redissonClient.getLock(generalLockKey);
+        try {
+            //giu lock 60s
+            if (lock.tryLock(60, TimeUnit.SECONDS)) {
+                //tao key cho tung ngay, 1 ngày trong chuỗi ngày đặt phòng mà hết phòng thì thất bại
+                for (LocalDate date : stayDates) {
+                    String holdKey = String.format("hold:room:%d:%s", roomId, date.toString());
+                    //lay cac phong co cac key giong nhu holdKey da co san trong redis
+                    RMapCache<String, String> holdRoomMap = redissonClient.getMapCache(holdKey);
+                    //những phòng đã được giu trước đó trong redis rồi
+                    int holdRoomRedis = holdRoomMap.size();
+                    //currentRoom = bookedRoom inDB + holdRoom in Redis
+                    if ((holdRoomRedis + bookedRoom) > MAX_ROOM_STOCK) {
+                        return false;
+                    }
+                }
+                //nếu tất cả các ngày đều còn trống thì tien hanh giu phong
+                //hoan toan cac phong luu trong redis lan nay la chua co trong redis truoc do, hoac co roi nhung bị xoa
+                //thi van la ko ton tai trong redis
+                for (LocalDate date : stayDates) {
+                    String holdKey = String.format("hold:room:%d:%s", roomId, date.toString());
+                    //add key
+                    RMapCache<String, String> holdMap = redissonClient.getMapCache(holdKey);
+                    //add field and value
+                    holdMap.put(bookingCode, "HOLDING", 10, TimeUnit.MINUTES);
+                }
+                //giu cho thanh cong
+                return true;
+            }
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new BusinessException(ResponseCode.ERROR_SYSTEM);
+        } finally {
+            //giai phong khoa ngan han
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
-        return null;
+    }
+
+    private List<LocalDate> getListDays(LocalDate checkIn, LocalDate checkOut) {
+        List<LocalDate> listStayedDate = new ArrayList<>();
+        LocalDate currentDate = checkIn;
+        while (currentDate.isBefore(checkOut)) {
+            listStayedDate.add(currentDate);
+            currentDate = currentDate.plusDays(1);
+        }
+        return listStayedDate;
     }
 
     public List<BookedRoom> getAllBookingsByRoomId(Long roomId) {
@@ -57,51 +113,82 @@ public class BookingService implements IBookingService{
 
     @Override
     public BookedRoom findByBookingConfirmationCode(String confirmationCode) {
-        return bookingRepository.findByBookingConfirmationCode(confirmationCode).orElseThrow(()->
+        return bookingRepository.findByBookingConfirmationCode(confirmationCode).orElseThrow(() ->
                 new ResourceNotFoundException("No booking found with booking code: " + confirmationCode));
     }
 
     @Override
     public String saveBooking(Long roomId, BookedRoom bookingRequest) {
-        if(bookingRequest.getCheckOutDate().isBefore(bookingRequest.getCheckInDate())){
-            throw new InvalidBookingRequestException("Check-in date must come before check-out date.");
+        LocalDate checkinDate = bookingRequest.getCheckInDate();
+        LocalDate checkoutDate = bookingRequest.getCheckOutDate();
+        validateRequest(bookingRequest);
+        /* check available room from check-indate to check-outdate */
+        RoomInventory roomInventory = roomInventoryRepository.findByAvailabilityRoom(roomId, checkinDate, checkoutDate);
+        if (roomInventory.getStock() <= 0) {
+            throw new BusinessException(ResponseCode.ROOM_EMPTY_INVALID);
         }
-        Room room = roomService.getRoomById(roomId).get();
-        List<BookedRoom> existingBookings = room.getBookings();
-        boolean roomIsAvailable = roomIsAvailable(bookingRequest, existingBookings);
-        if(roomIsAvailable){
-            //nếu phòng available rồi thì xét những trường hợp concurrency
-            int updateRows = roomInventoryService.processBookingRoom(roomId);
-            //optimistic locking
-            if(updateRows == 1){
-                room.addBooking(bookingRequest);
-                bookingRepository.save(bookingRequest);
-            }
-        }else{
-            throw new InvalidBookingRequestException("Sorry,this room is not available for the selected dates.");
+        /* holding room for customer in 1 minute */
+        //tạo một mã code cho giữ chỗ cho khach hang
+        String bookingCode = UUID.randomUUID().toString();
+        boolean holdRoomSuccess = holdRoom(roomId, bookingRequest.getCheckInDate(),
+                bookingRequest.getCheckOutDate(), bookingCode, roomInventory.getBookedRoom());
+        if (!holdRoomSuccess) {
+            throw new BusinessException(ResponseCode.BOOKED_ROOM_INVALID);
+        }
+        /* payment */
+        BigDecimal totalPrice = priceService.calculate(roomId, checkinDate, checkoutDate);
+        bookingRequest.setFinalPrice(totalPrice);
+        /* Optimistic lock + saveBooking in DB */
+        List<LocalDate> lstStayedDay = getListDays(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
+        boolean completeBookingRoom = completeBookingPayment(roomId, lstStayedDay, bookingCode, bookingRequest);
+        if (!completeBookingRoom) {
+            throw new BusinessException(ResponseCode.BOOKED_ROOM_INVALID);
         }
         return bookingRequest.getBookingConfirmationCode();
+    }
+
+    private void validateRequest(BookedRoom bookingRequest) {
+        /* check-indate > check-outdate*/
+        LocalDate checkinDate = bookingRequest.getCheckInDate();
+        LocalDate checkoutDate = bookingRequest.getCheckOutDate();
+        LocalDate currentDate = LocalDate.now();
+        if (checkinDate.isAfter(checkoutDate)) {
+            throw new BusinessException(ResponseCode.CHECKIN_DATE_INVALID);
+        }
+        if(checkinDate.isBefore(currentDate) || checkoutDate.isBefore(currentDate)){
+            throw new BusinessException(ResponseCode.CHECKIN_DATE_INVALID);
+        }
+        if(bookingRequest.getTotalNumOfGuest() <= 0){
+            throw new BusinessException(ResponseCode.TOTAL_NUMBER_GUEST_INVALID);
+        }
+    }
+
+    @Transactional
+    public boolean completeBookingPayment(Long roomId, List<LocalDate> lstStayedDay,
+                                           String bookingCode, BookedRoom bookingRequest) {
+        try {
+
+            Room room = roomService.getRoomById(roomId).get();
+            int updateRows = 0;
+            for (LocalDate date : lstStayedDay) {
+                updateRows = roomInventoryService.processBookingRoom(roomId, date);
+                //optimistic locking
+                if (updateRows == 1) {
+                    room.addBooking(bookingRequest);
+                    bookingRepository.save(bookingRequest);
+                } else {
+                    throw new BusinessException(ResponseCode.CONFLICTED_ROOM);
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            System.err.println("Failed Transaction: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
     public void cancelBooking(Long bookingId) {
         bookingRepository.deleteById(bookingId);
-    }
-
-    private boolean roomIsAvailable(BookedRoom bookingRequest, List<BookedRoom> existingBookings) {
-        return existingBookings.stream().noneMatch(existingBooking->
-                bookingRequest.getCheckInDate().equals(existingBooking.getCheckInDate())
-                || bookingRequest.getCheckOutDate().isBefore(existingBooking.getCheckOutDate())
-                ||(bookingRequest.getCheckInDate().isAfter(existingBooking.getCheckInDate())
-                && bookingRequest.getCheckInDate().isBefore(existingBooking.getCheckOutDate()))
-                ||(bookingRequest.getCheckInDate().isBefore(existingBooking.getCheckInDate())
-                && bookingRequest.getCheckOutDate().equals(existingBooking.getCheckOutDate()))
-                ||(bookingRequest.getCheckInDate().isBefore(existingBooking.getCheckInDate())
-                && bookingRequest.getCheckOutDate().isAfter(existingBooking.getCheckOutDate()))
-                ||(bookingRequest.getCheckInDate().equals(existingBooking.getCheckOutDate())
-                &&(bookingRequest.getCheckOutDate().equals(existingBooking.getCheckInDate())))
-                ||(bookingRequest.getCheckInDate().equals(existingBooking.getCheckOutDate())
-                && bookingRequest.getCheckOutDate().equals(bookingRequest.getCheckInDate()))
-        );
     }
 }

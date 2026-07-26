@@ -1,4 +1,4 @@
-package com.example.BookingHotel.Enum;
+package com.example.BookingHotel.constant;
 
 public enum PaymentType {
     VN_PAY("VNpay");
