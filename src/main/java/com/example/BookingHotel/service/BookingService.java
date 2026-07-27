@@ -8,13 +8,13 @@ import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.model.RoomInventory;
 import com.example.BookingHotel.repository.BookingRepository;
 import com.example.BookingHotel.repository.RoomInventoryRepository;
+import com.example.BookingHotel.request.InitPaymentRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,6 +36,7 @@ public class BookingService implements IBookingService {
     private final RedissonClient redissonClient;
     private static final int MAX_ROOM_STOCK = 20; //so luong toi da cho moi loai phong
     private final PriceService priceService;
+    private final IPaymentService paymentService;
 
     @Override
     public List<BookedRoom> getAllBookings() {
@@ -173,9 +174,10 @@ public class BookingService implements IBookingService {
             for (LocalDate date : lstStayedDay) {
                 updateRows = roomInventoryService.processBookingRoom(roomId, date);
                 //optimistic locking
-                if (updateRows == 1) {
+                if (updateRows == 1) {//version trong database
                     room.addBooking(bookingRequest);
                     bookingRepository.save(bookingRequest);
+                    finishedPayment(bookingRequest);
                 } else {
                     throw new BusinessException(ResponseCode.CONFLICTED_ROOM);
                 }
@@ -185,6 +187,16 @@ public class BookingService implements IBookingService {
             System.err.println("Failed Transaction: " + e.getMessage());
             return false;
         }
+    }
+
+    private void finishedPayment(BookedRoom bookingRequest) {
+        var initPaymentRequest = InitPaymentRequest.builder()
+                .customerId(bookingRequest.getCustomerId())
+                .amount(bookingRequest.getFinalPrice().longValue())
+                .txnRef(String.valueOf(bookingRequest.getBookingId()))
+                .ipAddress(bookingRequest.getIpAddress())
+                .build();
+        var initPaymentResponse = paymentService.init(initPaymentRequest);
     }
 
     @Override

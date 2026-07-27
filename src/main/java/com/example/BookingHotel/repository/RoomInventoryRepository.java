@@ -20,7 +20,8 @@ public interface RoomInventoryRepository extends JpaRepository<RoomInventory, Lo
             "r.version = r.version + 1 \n" +
             "WHERE r.room.id = :roomId and r.availableRoomDate = :date \n" +
             "and r.stock > 0")
-    int decreaseStock(@Param("roomId") Long roomId, @Param("date") LocalDate date);
+    int decreaseStock(@Param("roomId") Long roomId,
+                      @Param("date") LocalDate date);
 
     @Query(nativeQuery = true, value = SQLInventory.AVAILABLE_ROOM_CHECK)
     RoomInventory findByAvailabilityRoom(@Param("roomId") Long roomId,

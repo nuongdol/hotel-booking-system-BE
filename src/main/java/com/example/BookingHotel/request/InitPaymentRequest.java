@@ -16,9 +16,9 @@ public class InitPaymentRequest {
 
     private String ipAddress;
 
-    private Long userId;
+    private Long customerId;
 
     private String txnRef;
 
-    private long amount;
+    private Long amount;
 }

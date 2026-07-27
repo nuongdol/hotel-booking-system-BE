@@ -1,17 +1,20 @@
 package com.example.BookingHotel.response;
 
-
 import com.example.BookingHotel.model.BookedRoom;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-@Data
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
-public class PaymentResponse {
+public class InitPaymentResponse {
+
     private Long id;
     private BookedRoom booking;
     private String userEmail;
@@ -19,4 +22,5 @@ public class PaymentResponse {
     private BigDecimal paymentAccount;
     private String paymentStatus;
     private LocalDateTime timestamp;
+    private String vnpUrl;
 }
