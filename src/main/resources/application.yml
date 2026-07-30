@@ -1,1 +1,13 @@
+payment:
+  vnpay:
+    tmn-code:
+    secret-key:
+    init-payment-url:
+    return-url:
+    timeout:
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
 
