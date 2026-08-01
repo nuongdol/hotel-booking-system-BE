@@ -2,6 +2,7 @@ package com.example.BookingHotel.controller;
 
 
 import com.example.BookingHotel.exception.InvalidBookingRequestException;
+import com.example.BookingHotel.mapper.BookingMapper;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.response.ApiResponse;
@@ -30,6 +31,7 @@ import java.util.List;
 public class BookingController {
     private final IBookingService bookingService;
     private final IRoomService roomService;
+    private final BookingMapper bookingMapper;
 
     @GetMapping("/all-bookings")
     public ResponseEntity<List<BookingResponse>> getAllBookings() {
@@ -92,8 +94,16 @@ public class BookingController {
         RoomResponse room = new RoomResponse(theRoom.getId(),
                 theRoom.getRoomType(),
                 theRoom.getRoomPrice());
-        return new BookingResponse(booking.getBookingId(), booking.getCheckInDate(), booking.getCheckOutDate(),
-                booking.getGuestFullName(), booking.getGuestEmail(), booking.getNumOfAdults(), booking.getNumOfChildren(), booking.getTotalNumOfGuest(), booking.getBookingConfirmationCode(), room);
+        return bookingMapper.toBookingResponse(booking) ;
     }
 
+    @GetMapping("/{bookingId}/status")
+    ResponseEntity<String> getBookingStatus(@PathVariable Long bookingId) {
+        try {
+            String response = bookingService.getBookingStatus(bookingId);
+            return ResponseEntity.ok(response);
+        } catch (InvalidBookingRequestException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

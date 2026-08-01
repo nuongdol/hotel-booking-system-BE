@@ -32,6 +32,8 @@ public class BookingResponse {
 
     private RoomResponse room;
 
+    private Integer status;
+
     public BookingResponse(Long bookingId, LocalDate checkInDate,
                            LocalDate checkOutDate, String bookingConfirmationCode) {
         this.bookingId = bookingId;

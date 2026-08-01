@@ -1,85 +1,27 @@
-//package com.example.BookingHotel.controller;
-//
-//import com.example.BookingHotel.exception.InvalidPaymentRequestException;
-//import com.example.BookingHotel.model.Payment;
-//import com.example.BookingHotel.response.ApiResponse;
-//import com.example.BookingHotel.response.PaymentResponse;
-//import com.example.BookingHotel.response.VNPayResponse;
-//import com.example.BookingHotel.service.IPaymentService;
-//
-//import jakarta.servlet.http.HttpServletRequest;
-//import lombok.RequiredArgsConstructor;
-//
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.Optional;
-//
-//@RestController
-//@RequestMapping("/Payment")
-//@RequiredArgsConstructor
-//public class PaymentController {
-//    private final IPaymentService paymentService;
-//
-//    //thanh toan cho dat phong
-//    @PostMapping("/hotel/{bookingId}/payments")
-//    public ResponseEntity<?> PostNewPayment(@PathVariable("bookingId") Long bookingId,
-//                                            @RequestBody Payment payment){
-//        try{
-//           if(bookingId == payment.getBooking().getBookingId()){
-//               paymentService.postPayment(payment.getPaymentId(), payment.getBooking(), payment.getUserEmail(),
-//                       payment.getPaymentMethod(), payment.getPaymentAccount(), payment.getPaymentStatus()
-//               ,payment.getTimestamp());
-//               return ResponseEntity.ok("Pay successfully");
-//           }
-//        }catch (InvalidPaymentRequestException ex){
-//            return ResponseEntity.badRequest().body(ex.getMessage());
-//        }
-//        return null;
-//    }
-//
-//    //lay thong tin thanh toan cu the
-//    @GetMapping("/hotel/payments/{id}")
-//    public ResponseEntity<?> getPayment(@PathVariable("id") Long idPayment){
-//        Optional<Payment> payment = paymentService.getPayment(idPayment);
-//        PaymentResponse paymentResponse = new PaymentResponse(payment.get().getPaymentId(), payment.get().getBooking(),
-//                payment.get().getUserEmail(), payment.get().getPaymentMethod(),payment.get().getPaymentAccount(),
-//                payment.get().getPaymentStatus(),payment.get().getTimestamp());
-//
-//        return ResponseEntity.ok(paymentResponse);
-//    }
-//
-//    //cap nhật thông tin thanh toán
-//    @PutMapping("/hotel/payments/{id}/payed")
-//    public ResponseEntity<?> updatePayment(@PathVariable Long id, @RequestBody Payment payment){
-//        try{
-//            if(id == payment.getPaymentId()){
-//                paymentService.updatePayment(payment.getPaymentId(),payment.getUserEmail(),
-//                        payment.getPaymentMethod(), payment.getPaymentAccount(), payment.getPaymentStatus(), payment.getTimestamp());
-//                return ResponseEntity.ok("Update Pay successfully");
-//            }
-//        }catch(InvalidPaymentRequestException ex){
-//            return ResponseEntity.badRequest().body(ex.getMessage());
-//
-//        }
-//        return null;
-//    }
-//
-//    //Huỷ thông tin thanh toán
-//    @DeleteMapping("/hotel/payments/{id}")
-//    public void cancelPayment(@PathVariable("id") Long id) {
-//        paymentService.deletePayment(id);
-//    }
-//
-//    //payment using vnpay
-//    @GetMapping("/vn-pay")
-//    public ResponseEntity<ApiResponse<VNPayResponse>> pay(HttpServletRequest request){
-//        return new ResponseEntity<>(HttpStatus.OK, "Success", paymentService.createVnPayment(request));
-//    }
-//    @GetMapping("/vn-pay-callback")
-//    public ResponseEntity<ApiResponse<VNPayResponse>> payCallBackHandler(HttpServletRequest request){
-//       return null;
-//    }
-//
-//}
+package com.example.BookingHotel.controller;
+
+import com.example.BookingHotel.response.IpnResponse;
+import com.example.BookingHotel.service.IpnHandler;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@Slf4j
+@RestController
+@RequestMapping("/api/v1/payments")
+@RequiredArgsConstructor
+public class PaymentController {
+
+    private final IpnHandler ipnHandler;
+    //trả về trạng thái thanh toán
+    @GetMapping("/vnpay_ipn")
+    IpnResponse processIpn(@RequestParam Map<String, String> params){
+        log.info("[VNPay Ipn] Params: {}", params);
+        return ipnHandler.process(params);
+    }
+}

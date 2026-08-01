@@ -44,4 +44,5 @@ public class BookingRequest {
     private BigDecimal finalPrice;
 
     private String ipAddress;
+    private Integer status;
 }

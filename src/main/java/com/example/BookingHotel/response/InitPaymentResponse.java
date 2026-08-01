@@ -1,10 +1,7 @@
 package com.example.BookingHotel.response;
 
 import com.example.BookingHotel.model.BookedRoom;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class InitPaymentResponse {
 
     private Long id;
