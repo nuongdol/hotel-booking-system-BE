@@ -3,6 +3,7 @@ package com.example.BookingHotel.response;
 import com.example.BookingHotel.model.Room;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 @Data//getter and setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class BookingResponse {
 
     private Long bookingId;

@@ -2,12 +2,9 @@ package com.example.BookingHotel.controller;
 
 
 import com.example.BookingHotel.exception.InvalidBookingRequestException;
-import com.example.BookingHotel.mapper.BookingMapper;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
-import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.BookingResponse;
-import com.example.BookingHotel.response.HoleRoom;
 import com.example.BookingHotel.response.RoomResponse;
 import com.example.BookingHotel.service.IBookingService;
 import com.example.BookingHotel.service.IRoomService;
@@ -31,7 +28,6 @@ import java.util.List;
 public class BookingController {
     private final IBookingService bookingService;
     private final IRoomService roomService;
-    private final BookingMapper bookingMapper;
 
     @GetMapping("/all-bookings")
     public ResponseEntity<List<BookingResponse>> getAllBookings() {
@@ -94,7 +90,19 @@ public class BookingController {
         RoomResponse room = new RoomResponse(theRoom.getId(),
                 theRoom.getRoomType(),
                 theRoom.getRoomPrice());
-        return bookingMapper.toBookingResponse(booking) ;
+        return BookingResponse.builder()
+                .bookingId(booking.getBookingId())
+                .bookingConfirmationCode(booking.getBookingConfirmationCode())
+                .checkInDate(booking.getCheckInDate())
+                .checkOutDate(booking.getCheckOutDate())
+                .guestEmail(booking.getGuestEmail())
+                .NumOfAdults(booking.getNumOfAdults())
+                .guestFullName(booking.getGuestFullName())
+                .totalNumOfGuest(booking.getTotalNumOfGuest())
+                .NumOfChildren(booking.getNumOfChildren())
+                .status(booking.getStatus())
+                .room(room)
+                .build();
     }
 
     @GetMapping("/{bookingId}/status")

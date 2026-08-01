@@ -3,7 +3,6 @@ package com.example.BookingHotel.service;
 import com.example.BookingHotel.constant.ResponseCode;
 import com.example.BookingHotel.exception.BusinessException;
 import com.example.BookingHotel.exception.ResourceNotFoundException;
-import com.example.BookingHotel.mapper.BookingMapper;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.model.RoomInventory;
@@ -39,7 +38,6 @@ public class BookingService implements IBookingService {
     private static final int MAX_ROOM_STOCK = 20; //so luong toi da cho moi loai phong
     private final PriceService priceService;
     private final IPaymentService paymentService;
-    private final BookingMapper bookingMapper;
 
     @Override
     public List<BookedRoom> getAllBookings() {
@@ -58,10 +56,21 @@ public class BookingService implements IBookingService {
         if (bookingOtp.isEmpty()) {
             throw new BusinessException(ResponseCode.BOOKING_NOT_FOUND);
         }
-        final BookedRoom booking = bookingOtp.get();
+        BookedRoom booking = bookingOtp.get();
         booking.setStatus(4);
         bookingRepository.save(booking);
-        return bookingMapper.toBookingResponse(booking);
+        return BookingResponse.builder()
+                .bookingId(booking.getBookingId())
+                .bookingConfirmationCode(booking.getBookingConfirmationCode())
+                .checkInDate(booking.getCheckInDate())
+                .checkOutDate(booking.getCheckOutDate())
+                .guestEmail(booking.getGuestEmail())
+                .NumOfAdults(booking.getNumOfAdults())
+                .guestFullName(booking.getGuestFullName())
+                .totalNumOfGuest(booking.getTotalNumOfGuest())
+                .NumOfChildren(booking.getNumOfChildren())
+                .status(booking.getStatus())
+                .build();
     }
 
     @Override
@@ -70,12 +79,13 @@ public class BookingService implements IBookingService {
         if (bookingOtp.isEmpty()) {
             throw new BusinessException(ResponseCode.BOOKING_NOT_FOUND);
         }
-        BookingResponse booking = bookingMapper.toBookingResponse(bookingOtp.get());
+        BookedRoom bookedRoom = bookingOtp.get();
+        //BookingResponse booking = bookingMapper.toBookingResponse(bookingOtp.get());
         /*
         pending = 1, confirmed = 2, cancelled = 3, completed = 4,
         no_show = 5
         */
-        Integer status = booking.getStatus();
+        Integer status = bookedRoom.getStatus();
         String statusResponse;
         switch (status) {
             case 1:
@@ -225,11 +235,11 @@ public class BookingService implements IBookingService {
                 if (updateRows == 1) {//version trong database
                     room.addBooking(bookingRequest);
                     bookingRepository.save(bookingRequest);
-                    finishedPayment(bookingRequest);
                 } else {
                     throw new BusinessException(ResponseCode.CONFLICTED_ROOM);
                 }
             }
+            finishedPayment(bookingRequest);
             return true;
         } catch (Exception e) {
             System.err.println("Failed Transaction: " + e.getMessage());

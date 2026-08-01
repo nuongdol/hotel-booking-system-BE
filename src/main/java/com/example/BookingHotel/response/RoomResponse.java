@@ -5,7 +5,11 @@ import lombok.NoArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.util.List;
+
+import static org.apache.tomcat.util.codec.binary.Base64.encodeBase64String;
+
 @Data
 @NoArgsConstructor
 
@@ -31,7 +35,7 @@ public class RoomResponse {
         this.roomPrice = roomPrice;
         this.isBooked = isBooked;
         //change a string from byte to string
-        this.photo = (photoBytes != null)? Base64.encodeBase64String(photoBytes) : null;
+        this.photo = (photoBytes != null)? encodeBase64String(photoBytes) : null;
     }
 
 }
