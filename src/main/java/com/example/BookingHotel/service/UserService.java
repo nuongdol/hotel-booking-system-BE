@@ -7,6 +7,7 @@ import com.example.BookingHotel.repository.RoleRepository;
 import com.example.BookingHotel.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -24,26 +26,23 @@ public class UserService implements IUserService {
 
     @Override
     public User registerUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())){
+        if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException(user.getEmail() + " already exists");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        System.out.println(user.getPassword());
         Role userRole = roleRepository.findByName("ROLE_USER").get();
         user.setRoles(Collections.singletonList(userRole));
         return userRepository.save(user);
     }
-    public User registerAdmin(User Admin){
-        if(userRepository.existsByEmail(Admin.getEmail())){
+
+    public User registerAdmin(User Admin) {
+        if (userRepository.existsByEmail(Admin.getEmail())) {
             throw new UserAlreadyExistsException(Admin.getEmail() + "already exists");
         }
         Admin.setPassword(passwordEncoder.encode(Admin.getPassword()));//lay password ma hoa roi khoi tao password nay
-        //cho admin
-        System.out.println(Admin.getPassword());
         Role adminRole = roleRepository.findByName("ROLE_ADMIN").get();
         Admin.setRoles(Collections.singletonList(adminRole));
         return userRepository.save(Admin);
-
     }
 
     @Override
@@ -55,7 +54,7 @@ public class UserService implements IUserService {
     @Override
     public void deleteUser(String email) {
         User theUser = getUser(email);
-        if (theUser != null){
+        if (theUser != null) {
             userRepository.deleteByEmail(email);
         }
 
