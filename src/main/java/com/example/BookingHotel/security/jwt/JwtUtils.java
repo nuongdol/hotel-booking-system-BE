@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
 
 
 @Component
@@ -26,7 +27,10 @@ public class JwtUtils {
     @Value("${auth.token.expirationInMils}")
     private int jwtExpirationMs;
 
-    public String generateJwtTokenForUser(Authentication authentication){
+    @Value("${auth.token.expirationInMilsForRefreshToken}")
+    private int getJwtExpirationMsForRefToken;
+
+    public String generateJwtTokenForUser(Authentication authentication) {
         HotelUserDetails userPrincipal = (HotelUserDetails) authentication.getPrincipal();
         List<String> roles = userPrincipal.getAuthorities()
                 .stream()
@@ -35,34 +39,61 @@ public class JwtUtils {
                 .setSubject(userPrincipal.getUsername())
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime()+jwtExpirationMs))
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key(), SignatureAlgorithm.HS256).compact();
+    }
+
+    public String generateJwtRefreshTokenForUser(Authentication authentication) {
+        HotelUserDetails userPrincipal = (HotelUserDetails) authentication.getPrincipal();
+        List<String> roles = userPrincipal.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority).toList();
+        return Jwts.builder()
+                .setSubject(userPrincipal.getUsername())
+                .claim("roles", roles)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + getJwtExpirationMsForRefToken))
                 .signWith(key(), SignatureAlgorithm.HS256).compact();
     }
 
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
-    public String getUserNameFromToken(String token){
+
+    public String getUserNameFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key())
                 .build()
                 .parseClaimsJws(token).getBody().getSubject();
     }
-    public boolean validateToken(String token){
-        try{
+
+    public boolean validateToken(String token) {
+        try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(token);
             return true;
-        }catch(MalformedJwtException e){
+        } catch (MalformedJwtException e) {
             logger.error("Invalid jwt token : {} ", e.getMessage());
-        }catch (ExpiredJwtException e){
+        } catch (ExpiredJwtException e) {
             logger.error("Expired token : {} ", e.getMessage());
-        }catch (UnsupportedJwtException e){
+        } catch (UnsupportedJwtException e) {
             logger.error("This token is not supported : {} ", e.getMessage());
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             logger.error("No claims found : {} ", e.getMessage());
         }
         return false;
     }
 
 
+    public Date extractExpiration(String refreshToken) {
+        return extractClaims(refreshToken, Claims::getExpiration);
+    }
+
+    private <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claimsResolver.apply(claims);
+    }
 }

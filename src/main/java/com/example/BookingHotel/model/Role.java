@@ -17,15 +17,19 @@ import java.util.List;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
+    @Column(name = "role_id")
+    private Long roleId;
 
+    @Column(name = "role_name")
+    private String roleName;
+
+    //mối quan hệ N-N user-roles
     @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private Collection<User> users = new HashSet<>();
 
     public Role(String name) {
-        this.name = name;
+        this.roleName = name;
     }
     //dang thuc hien tren role
     public void assignRoleToUser(User user){
@@ -46,6 +50,6 @@ public class Role {
         }
     }
     public  String getName(){
-        return name != null? name : "";
+        return roleName != null? roleName : "";
     }
 }

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class HotelUserDetails implements UserDetails {
+public class HotelUserDetails extends User implements UserDetails {
     private Long id;
     private  String email;
     private String password;
