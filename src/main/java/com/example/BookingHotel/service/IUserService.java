@@ -1,14 +1,16 @@
 package com.example.BookingHotel.service;
 
 import com.example.BookingHotel.model.User;
+import com.example.BookingHotel.request.UserRequest;
+import com.example.BookingHotel.response.UserResponse;
 
 import java.util.List;
 
 
 
 public interface IUserService {
-    User registerUser(User user);
-    User registerAdmin(User Admin);
+    UserResponse registerUser(UserRequest user);
+    UserResponse registerAdmin(UserRequest admin);
     List<User> getUsers();
     void deleteUser(String email);
     User getUser(String email);

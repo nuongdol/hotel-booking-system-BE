@@ -5,6 +5,8 @@ import com.example.BookingHotel.model.User;
 import com.example.BookingHotel.request.LoginRequest;
 import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.JwtResponse;
+import com.example.BookingHotel.request.UserRequest;
+import com.example.BookingHotel.response.UserResponse;
 import com.example.BookingHotel.service.IAuthService;
 import com.example.BookingHotel.service.IUserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,34 +32,42 @@ public class AuthController {
 
 
     @PostMapping("/register-user")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody User user) {
+    public ResponseEntity<ApiResponse<Object>> registerUser(@Valid @RequestBody UserRequest user) {
         try {
+            UserResponse userRegister = userService.registerUser(user);
             log.info("User:{} {} register the hotel booking website", user.getFirstName(), user.getLastName());
-            User userRegister = userService.registerUser(user);
             ApiResponse<Object> response = ApiResponse.builder()
                     .data(userRegister)
-                    .code(200)
+                    .code(HttpStatus.CREATED.value())
                     .message("Successful Registration!")
                     .build();
             return ResponseEntity.ok(response);
         } catch (UserAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            ApiResponse<Object> response = ApiResponse.builder()
+                    .code(HttpStatus.CONFLICT.value())
+                    .message(e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
     }
 
     @PostMapping("/register-admin")
-    public ResponseEntity<?> registerAdmin(@Valid @RequestBody User admin) {
+    public ResponseEntity<ApiResponse<Object>> registerAdmin(@Valid @RequestBody UserRequest admin) {
         try {
+            UserResponse adminRegister = userService.registerAdmin(admin);
             log.info("Admin:{} {} register the hotel booking website", admin.getFirstName(), admin.getLastName());
-            User adminRegister = userService.registerAdmin(admin);
             ApiResponse<Object> response = ApiResponse.builder()
                     .data(adminRegister)
-                    .code(200)
+                    .code(HttpStatus.CREATED.value())
                     .message("Successful Registration!")
                     .build();
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            ApiResponse<Object> response = ApiResponse.builder()
+                    .code(HttpStatus.CONFLICT.value())
+                    .message(e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
     }
 

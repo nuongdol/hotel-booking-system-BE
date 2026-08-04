@@ -5,44 +5,78 @@ import com.example.BookingHotel.model.Role;
 import com.example.BookingHotel.model.User;
 import com.example.BookingHotel.repository.RoleRepository;
 import com.example.BookingHotel.repository.UserRepository;
+import com.example.BookingHotel.request.UserRequest;
+import com.example.BookingHotel.response.UserResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class UserService implements IUserService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
 
     @Override
-    public User registerUser(User user) {
+    public UserResponse registerUser(UserRequest user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException(user.getEmail() + " already exists");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByName("ROLE_USER").get();
-        user.setRoles(Collections.singletonList(userRole));
-        return userRepository.save(user);
+        User userRegister = User.builder()
+                .address(user.getAddress())
+                .phone(user.getPhone())
+                .lastName(user.getLastName())
+                .firstName(user.getFirstName())
+                .email(user.getEmail())
+                .password(passwordEncoder.encode(user.getPassword()))
+                .roles(Collections.singletonList(userRole))
+                .createdAt(LocalDateTime.now())
+                .build();
+        userRepository.save(userRegister);
+        return UserResponse.builder()
+                .address(user.getAddress())
+                .phone(user.getPhone())
+                .email(user.getEmail())
+                .lastName(user.getLastName())
+                .firstName(userRegister.getFirstName())
+                .roles(Collections.singletonList(userRole))
+                .build();
     }
 
-    public User registerAdmin(User Admin) {
-        if (userRepository.existsByEmail(Admin.getEmail())) {
-            throw new UserAlreadyExistsException(Admin.getEmail() + "already exists");
+    public UserResponse registerAdmin(UserRequest admin) {
+        if (userRepository.existsByEmail(admin.getEmail())) {
+            throw new UserAlreadyExistsException(admin.getEmail() + "already exists");
         }
-        Admin.setPassword(passwordEncoder.encode(Admin.getPassword()));//lay password ma hoa roi khoi tao password nay
         Role adminRole = roleRepository.findByName("ROLE_ADMIN").get();
-        Admin.setRoles(Collections.singletonList(adminRole));
-        return userRepository.save(Admin);
+        User adminRegister = User.builder()
+                .address(admin.getAddress())
+                .phone(admin.getPhone())
+                .lastName(admin.getLastName())
+                .firstName(admin.getFirstName())
+                .email(admin.getEmail())
+                .password(passwordEncoder.encode(admin.getPassword()))
+                .roles(Collections.singletonList(adminRole))
+                .createdAt(LocalDateTime.now())
+                .build();
+        userRepository.save(adminRegister);
+        return UserResponse.builder()
+                .address(adminRegister.getAddress())
+                .phone(adminRegister.getPhone())
+                .email(adminRegister.getEmail())
+                .lastName(adminRegister.getLastName())
+                .firstName(adminRegister.getFirstName())
+                .roles(Collections.singletonList(adminRole))
+                .build();
     }
 
     @Override
