@@ -3,8 +3,12 @@ package com.example.BookingHotel.controller;
 import com.example.BookingHotel.exception.RoleAlreadyExistException;
 import com.example.BookingHotel.model.Role;
 import com.example.BookingHotel.model.User;
+import com.example.BookingHotel.request.RoleDto;
+import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.service.IRoleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,45 +19,58 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/roles")
+@RequestMapping("/api/v1/role")
+@Slf4j
 public class RoleController {
     private final IRoleService roleService;
 
 
     @GetMapping("/all-roles")
-    public ResponseEntity<List<Role>> getAllRoles(){
+    public ResponseEntity<List<Role>> getAllRoles() {
         return new ResponseEntity<>(roleService.getRoles(), HttpStatus.FOUND);
     }
 
     @PostMapping("/create-new-role")
-    public ResponseEntity<String> createRole(@RequestBody Role theRole){
-        try{
-            roleService.createRole(theRole);
-            return ResponseEntity.ok("New role created successfully!");
-        }catch(RoleAlreadyExistException re){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(re.getMessage());
-
+    public ResponseEntity<ApiResponse<Object>> createRole(@Valid @RequestBody RoleDto theRole) {
+        try {
+            Role roleSave = roleService.createRole(theRole);
+            log.info("Admin {} add new role {} for the system", null, roleSave.getName());
+            ApiResponse<Object> response = ApiResponse.builder()
+                    .data(roleSave)
+                    .code(HttpStatus.CREATED.value())
+                    .message("New role created successfully!")
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (RoleAlreadyExistException e) {
+            ApiResponse<Object> response = ApiResponse.builder()
+                    .code(HttpStatus.CONFLICT.value())
+                    .message(e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
     }
+
     @DeleteMapping("/delete/{roleId}")
-    public void deleteRole(@PathVariable("roleId") Long roleId){
+    public void deleteRole(@PathVariable("roleId") Long roleId) {
         roleService.deleteRole(roleId);
     }
+
     @PostMapping("/remove-all-users-from-role/{roleId}")
-    public Role removeAllUsersFromRole(@PathVariable("roleId") Long roleId){
+    public Role removeAllUsersFromRole(@PathVariable("roleId") Long roleId) {
         return roleService.removeAllUsersFromRole(roleId);
     }
 
     @PostMapping("/remove-user-from-role")
     public User removeUserFromRole(
             @RequestParam("userId") Long userId,
-            @RequestParam("roleId") Long roleId){
+            @RequestParam("roleId") Long roleId) {
         return roleService.removeUserFromRole(userId, roleId);
     }
+
     @PostMapping("/assign-user-to-role")
     public User assignUserToRole(
             @RequestParam("userId") Long userId,
-            @RequestParam("roleId") Long roleId){
+            @RequestParam("roleId") Long roleId) {
         return roleService.assignRoleToUser(userId, roleId);
     }
 }

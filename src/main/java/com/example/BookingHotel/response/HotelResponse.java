@@ -1,6 +1,7 @@
 package com.example.BookingHotel.response;
 
 import com.example.BookingHotel.model.City;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -11,6 +12,7 @@ import java.sql.Blob;
 import java.util.List;
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class HotelResponse {
     private Long hotelId;
     private String nameHotel;

@@ -6,6 +6,7 @@ import com.example.BookingHotel.model.Role;
 import com.example.BookingHotel.model.User;
 import com.example.BookingHotel.repository.RoleRepository;
 import com.example.BookingHotel.repository.UserRepository;
+import com.example.BookingHotel.request.RoleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class RoleService implements IRoleService {
 
 
     @Override
-    public Role createRole(Role theRole) {
+    public Role createRole(RoleDto theRole) {
         String roleName = "ROLE_"+ theRole.getName().toUpperCase();//ROLE_roles-user
         Role role = new Role(roleName);
         if (roleRepository.existsByName(roleName)){

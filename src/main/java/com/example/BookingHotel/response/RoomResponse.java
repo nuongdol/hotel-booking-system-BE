@@ -1,5 +1,6 @@
 package com.example.BookingHotel.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -12,7 +13,7 @@ import static org.apache.tomcat.util.codec.binary.Base64.encodeBase64String;
 
 @Data
 @NoArgsConstructor
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoomResponse {
     private Long id;
     private String roomType;
