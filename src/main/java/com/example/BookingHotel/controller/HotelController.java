@@ -24,19 +24,18 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/hotels")
+@RequestMapping("/api/v1/hotel")
 public class HotelController {
+
     private final HotelService hotelService;
-    private final RoomService roomService;
-    @PostMapping("/add/new-hotel")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+
+    @PostMapping("/add-hotel")
+    @PreAuthorize("hasRole('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<HotelResponse> addNewHotel(@RequestParam("image") MultipartFile imageHotel,
                                                      @RequestParam("name") String nameHotel,
                                                      @RequestParam("address") String addressHotel,
                                                      @RequestParam("rate") String rateHotel) throws SQLException, IOException {
         Hotel saveHotel = hotelService.addNewHotel(imageHotel,nameHotel,addressHotel, Float.parseFloat(rateHotel));
-        //hotel display
-//        HotelResponse response = getHotelResponse(saveHotel);
         HotelResponse response = new HotelResponse(saveHotel.getHotelId(),saveHotel.getNameHotel(), saveHotel.getAddressHotel(), saveHotel.getRateHotel());
         return ResponseEntity.ok(response);
     }

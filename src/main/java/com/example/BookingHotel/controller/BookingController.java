@@ -24,8 +24,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 //@CrossOrigin("http://localhost:5173")
-@RequestMapping("/api/v1/bookings/")
+@RequestMapping("/api/v1/booking")
 public class BookingController {
+
     private final IBookingService bookingService;
     private final IRoomService roomService;
 
