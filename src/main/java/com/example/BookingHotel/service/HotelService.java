@@ -1,44 +1,68 @@
 package com.example.BookingHotel.service;
 
 import com.example.BookingHotel.exception.ResourceNotFoundException;
+import com.example.BookingHotel.model.City;
 import com.example.BookingHotel.model.Hotel;
+import com.example.BookingHotel.repository.CityRepository;
 import com.example.BookingHotel.repository.HotelRepository;
+import com.example.BookingHotel.request.HotelRequest;
+import com.example.BookingHotel.response.HotelResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class HotelService implements IHotelService {
+
     private final HotelRepository hotelRepository;
+    private final CityRepository cityRepository;
+
     //add new a hotel
     @Override
-    public Hotel addNewHotel(MultipartFile file, String nameHotel, String addressHotel, float rateHotel) throws SQLException, IOException {
+    public Hotel addHotel(HotelRequest hotelRequest) throws SQLException, IOException {
+        //save city
+        City city = new City();
+        city.setNameCity(hotelRequest.getNameHotel());
+        City citySave = cityRepository.save(city);
+        //save hotel
         Hotel hotel = new Hotel();
-        hotel.setAddressHotel(addressHotel);
-        hotel.setNameHotel(nameHotel);
-        hotel.setRateHotel(rateHotel);
-        if(!file.isEmpty()){
-            byte[] imageHotel = file.getBytes();
+        hotel.setAddressHotel(hotel.getAddressHotel());
+        hotel.setNameHotel(hotel.getNameHotel());
+        hotel.setRateHotel(hotel.getRateHotel());
+        if(!hotelRequest.getImageHotel().isEmpty()){
+            byte[] imageHotel = hotelRequest.getImageHotel().getBytes();
             Blob imageBlob = new SerialBlob(imageHotel);//SerialBlob convert byte to blob
             hotel.setImageHotel(imageBlob);
         }
-
+        hotel.setCreatedAt(LocalDateTime.now());
+        hotel.setCity(citySave);
         return hotelRepository.save(hotel);
     }
 
     //get all hotel
     @Override
-    public List<Hotel> getAllHotel() {
-        return hotelRepository.findAll();
+    public Set<HotelResponse> getAllHotel() {
+        Set<HotelResponse> lstHotel = hotelRepository.getListHotel();
+//        for (Hotel hotel : hotels) {
+//            byte[] imageHotels = hotelService.getImageHotelByHotelId(hotel.getHotelId());
+//            if (imageHotels != null && imageHotels.length > 0) {
+//                String base64Image = Base64.encodeBase64String(imageHotels);
+//                HotelResponse hotelResponse = getHotelResponse(hotel);
+//                hotelResponse.setImageHotel(base64Image);
+//                hotelResponses.add(hotelResponse);
+//            }
+//        }
     }
 
     //get imageHotel of the hotel which you wants

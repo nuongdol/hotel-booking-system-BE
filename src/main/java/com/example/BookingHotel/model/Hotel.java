@@ -7,6 +7,7 @@ import lombok.*;
 
 
 import java.sql.Blob;
+import java.time.LocalDateTime;
 import java.util.Set;
 @Entity
 @Data
@@ -40,6 +41,11 @@ public class Hotel {
     @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Room> rooms;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_city", nullable = false)

@@ -23,6 +23,4 @@ public class City {
     //1-n
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Hotel> hotel;
-
-
 }

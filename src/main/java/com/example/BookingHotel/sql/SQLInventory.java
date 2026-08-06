@@ -2,7 +2,7 @@ package com.example.BookingHotel.sql;
 
 public class SQLInventory {
 
-    public static  final String  AVAILABLE_ROOM_CHECK =
+    public static final String  AVAILABLE_ROOM_CHECK =
             "select i.room_inventory_id as roomInventoryId,\n" +
                     "\t   i.available_room_date as availableRoomDate,\n" +
                     "       i.booked_room as bookedRoom,\n" +

@@ -6,9 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 
-
-
-import java.sql.Blob;
 import java.util.List;
 @Data
 @NoArgsConstructor
