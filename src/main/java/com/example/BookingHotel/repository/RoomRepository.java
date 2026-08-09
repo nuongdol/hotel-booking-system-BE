@@ -13,6 +13,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 @EnableJpaRepositories
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
@@ -26,4 +29,9 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         "SELECT br.room.id FROM BookedRoom br " +
         "WHERE (br.checkInDate <= :checkOutDate AND br.checkOutDate >= :checkInDate))") // Điều kiện thời gian đã được sửa
     List<Room> findAvailableRoomsByDatesAndType( LocalDate checkInDate,LocalDate checkOutDate,String roomType);
+
+
+    Set<Room> getRoom(Long hotelId);
+
+    Optional<Set<Room>> findByHotelId(Long hotelId);
 }

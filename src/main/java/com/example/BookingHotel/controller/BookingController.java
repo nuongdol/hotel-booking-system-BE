@@ -30,7 +30,7 @@ public class BookingController {
     private final IBookingService bookingService;
     private final IRoomService roomService;
 
-    @GetMapping("/all-bookings")
+    @GetMapping()
     public ResponseEntity<List<BookingResponse>> getAllBookings() {
         List<BookedRoom> bookings = bookingService.getAllBookings();
         List<BookingResponse> bookingResponses = new ArrayList<>();
@@ -53,7 +53,7 @@ public class BookingController {
     }
 
     //luu thong tin dat phong
-    @PostMapping("/room/{roomId}/booking")
+    @PostMapping("/{roomId}")
     public ResponseEntity<?> saveBooking(@PathVariable("roomId") Long roomId,
                                          @RequestBody BookedRoom bookingRequest,
                                          HttpServletRequest httpServletRequest) {
@@ -69,13 +69,13 @@ public class BookingController {
         }
     }
 
-    @DeleteMapping("/booking/{bookingId}/delete")
+    @DeleteMapping("/{bookingId}")
     public void cancelBooking(@PathVariable("bookingId") Long bookingId) {
         bookingService.cancelBooking(bookingId);
 
     }
 
-    @GetMapping("/user/{userId}/bookings")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<List<BookingResponse>> getBookingByUserEmail(@PathVariable("userId") String email) {
         List<BookedRoom> bookings = bookingService.getBookingsByUserEmail(email);
         List<BookingResponse> bookingResponses = new ArrayList<>();

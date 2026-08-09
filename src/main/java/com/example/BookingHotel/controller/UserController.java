@@ -18,7 +18,7 @@ import java.util.List;
 public class UserController {
     private final IUserService userService;
 
-    @GetMapping("/all")
+    @GetMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<User>> getUsers(){
 
@@ -37,7 +37,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching user");
         }
     }
-    @DeleteMapping("/delete/{userId}")
+    @DeleteMapping("/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and #email == principal.username)")
     public ResponseEntity<String> deleteUser(@PathVariable("userId") String email){
         try{
