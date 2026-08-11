@@ -23,7 +23,8 @@ public enum ResponseCode {
     HOTEL_NOT_FOUND("HOTEL_NOT_FOUND", 404),
     CITY_NOT_FOUND("CITY_NOT_FOUND", 404 ),
     DATABASE_ERROR("DATABASE_ERROR", 500 ),
-    FILE_PROCESSING_ERROR("FILE_PROCESSING_ERROR", 500);
+    FILE_PROCESSING_ERROR("FILE_PROCESSING_ERROR", 500),
+    ROLE_NOT_EXSIT("ROLE_NOT_EXSIT", 404 );
 
     private final String message;
     private final Integer code;

@@ -1,12 +1,15 @@
 package com.example.BookingHotel.service;
 
-import com.example.BookingHotel.exception.RoleAlreadyExistException;
+import com.example.BookingHotel.constant.ResponseCode;
+import com.example.BookingHotel.exception.BusinessException;
 import com.example.BookingHotel.exception.UserAlreadyExistsException;
+import com.example.BookingHotel.mapper.RoleMapper;
 import com.example.BookingHotel.model.Role;
 import com.example.BookingHotel.model.User;
 import com.example.BookingHotel.repository.RoleRepository;
 import com.example.BookingHotel.repository.UserRepository;
 import com.example.BookingHotel.request.RoleDto;
+import com.example.BookingHotel.response.RoleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.util.Optional;
 public class RoleService implements IRoleService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final RoleMapper roleMapper;
 
     @Override
     public List<Role> getRoles() {
@@ -27,13 +31,14 @@ public class RoleService implements IRoleService {
 
 
     @Override
-    public Role createRole(RoleDto theRole) {
+    public RoleResponse createRole(RoleDto theRole) {
         String roleName = "ROLE_"+ theRole.getName().toUpperCase();//ROLE_roles-user
         Role role = new Role(roleName);
         if (roleRepository.existsByName(roleName)){
-            throw new RoleAlreadyExistException(theRole.getName()+" role already exists");
+            throw new BusinessException(ResponseCode.ROLE_NOT_EXSIT);
         }
-        return roleRepository.save(role);
+        roleRepository.save(role);
+        return roleMapper.toRoleResponse(role);
     }
 
     @Override

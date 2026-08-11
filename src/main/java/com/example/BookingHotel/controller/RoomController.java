@@ -43,7 +43,6 @@ public class RoomController {
                                                     , IOException {
         Room saveRoom = roomService.addNewRoom(photo, roomType, roomPrice);
         RoomResponse response = new RoomResponse(saveRoom.getId(),saveRoom.getRoomType(),saveRoom.getRoomPrice());
-
         return ResponseEntity.ok(response);
     }
 

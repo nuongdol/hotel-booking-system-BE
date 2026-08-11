@@ -3,10 +3,8 @@ package com.example.BookingHotel.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.tomcat.util.codec.binary.Base64;
 
 import java.math.BigDecimal;
-import java.sql.Blob;
 import java.util.List;
 
 import static org.apache.tomcat.util.codec.binary.Base64.encodeBase64String;

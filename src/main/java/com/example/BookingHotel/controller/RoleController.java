@@ -5,6 +5,7 @@ import com.example.BookingHotel.model.Role;
 import com.example.BookingHotel.model.User;
 import com.example.BookingHotel.request.RoleDto;
 import com.example.BookingHotel.response.ApiResponse;
+import com.example.BookingHotel.response.RoleResponse;
 import com.example.BookingHotel.service.IRoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,24 +26,24 @@ public class RoleController {
     private final IRoleService roleService;
 
 
-    @GetMapping("/all-roles")
+    @GetMapping()
     public ResponseEntity<List<Role>> getAllRoles() {
         return new ResponseEntity<>(roleService.getRoles(), HttpStatus.FOUND);
     }
 
-    @PostMapping("/create-new-role")
-    public ResponseEntity<ApiResponse<Object>> createRole(@Valid @RequestBody RoleDto theRole) {
+    @PostMapping()
+    public ResponseEntity<ApiResponse<RoleResponse>> createRole(@Valid @RequestBody RoleDto theRole) {
         try {
-            Role roleSave = roleService.createRole(theRole);
+            RoleResponse roleSave = roleService.createRole(theRole);
             log.info("Admin {} add new role {} for the system", null, roleSave.getName());
-            ApiResponse<Object> response = ApiResponse.builder()
+            ApiResponse<RoleDto> response = ApiResponse.builder()
                     .data(roleSave)
                     .code(HttpStatus.CREATED.value())
                     .message("New role created successfully!")
                     .build();
             return ResponseEntity.ok(response);
         } catch (RoleAlreadyExistException e) {
-            ApiResponse<Object> response = ApiResponse.builder()
+            ApiResponse<RoleResponse> response = ApiResponse.builder()
                     .code(HttpStatus.CONFLICT.value())
                     .message(e.getMessage())
                     .build();
@@ -50,12 +51,12 @@ public class RoleController {
         }
     }
 
-    @DeleteMapping("/delete/{roleId}")
+    @DeleteMapping("/{roleId}")
     public void deleteRole(@PathVariable("roleId") Long roleId) {
         roleService.deleteRole(roleId);
     }
 
-    @PostMapping("/remove-all-users-from-role/{roleId}")
+    @PostMapping("/{roleId}")
     public Role removeAllUsersFromRole(@PathVariable("roleId") Long roleId) {
         return roleService.removeAllUsersFromRole(roleId);
     }

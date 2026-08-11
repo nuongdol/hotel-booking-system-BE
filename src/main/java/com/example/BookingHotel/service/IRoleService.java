@@ -3,6 +3,7 @@ package com.example.BookingHotel.service;
 import com.example.BookingHotel.model.Role;
 import com.example.BookingHotel.model.User;
 import com.example.BookingHotel.request.RoleDto;
+import com.example.BookingHotel.response.RoleResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +11,7 @@ import java.util.Optional;
 
 public interface IRoleService {
     List<Role> getRoles();
-    Role createRole(RoleDto theRole);
+    RoleResponse createRole(RoleDto theRole);
 
     void deleteRole(Long id);
     Role findByName(String name);
