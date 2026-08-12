@@ -4,10 +4,14 @@ import com.example.BookingHotel.exception.PhotoRetrievalException;
 import com.example.BookingHotel.exception.ResourceNotFoundException;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
+import com.example.BookingHotel.request.RoomRequest;
+import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.RoomResponse;
 import com.example.BookingHotel.service.BookingService;
 import com.example.BookingHotel.service.IRoomService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -28,33 +32,34 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 //@CrossOrigin("http://localhost:5173")
-@RequestMapping("/rooms")
+@RequestMapping("/api/v1/rooms")
 public class RoomController {
     private final IRoomService roomService;
     private final BookingService bookingService;
 
-    //add new room for hotel: thêm phòng mới
-    @PostMapping("/add/new-room")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<RoomResponse> addNewRoom(@RequestParam("photo") MultipartFile photo,
-                                                   @RequestParam("roomType") String roomType,
-                                                   @RequestParam("roomPrice") BigDecimal roomPrice) throws SQLException
-                                                    , IOException {
-        Room saveRoom = roomService.addNewRoom(photo, roomType, roomPrice);
-        RoomResponse response = new RoomResponse(saveRoom.getId(),saveRoom.getRoomType(),saveRoom.getRoomPrice());
+    @PostMapping()
+    @PreAuthorize("hasRole('ROLE_ADMIN','ROLE_OWNER')")
+    public ResponseEntity<ApiResponse<RoomResponse>> addNewRoom(@Valid @RequestBody RoomRequest roomRequest){
+        RoomResponse saveRoom = roomService.addNewRoom(roomRequest);
+        log.info("add new room: {}",saveRoom);
+        ApiResponse<RoomResponse> response = ApiResponse.<RoomResponse>builder()
+                .message("Add new room")
+                .status("SUCCESS")
+                .code(200)
+                .data(saveRoom)
+                .build();
         return ResponseEntity.ok(response);
     }
 
-    //add type room: tìm tất cả các loại phòng
-    @GetMapping("/room/types")
+    @GetMapping("/type")
     public List<String> getRoomType(){
         return roomService.getAllRoomTypes();
     }
 
 
-    //thuc hien truy cap cac phong va hien thi tren giao dien phia backend
-    @GetMapping("/all-rooms")
+    @GetMapping()
     public ResponseEntity<List<RoomResponse>> getAllRooms() throws SQLException {
         List<Room> rooms = roomService.getAllRoom();
         List<RoomResponse> roomResponses = new ArrayList<>();
@@ -81,8 +86,8 @@ public class RoomController {
     }
 
     //cập nhật phòng
-    @PutMapping("/update/{roomId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/{roomId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long roomId,
                                                    @RequestParam(required = false) String roomType,
                                                    @RequestParam(required = false) BigDecimal roomPrice,

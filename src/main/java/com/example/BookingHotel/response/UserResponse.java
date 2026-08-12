@@ -17,6 +17,8 @@ import java.util.HashSet;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
 
+    private Long userId;
+
     private String firstName;
 
     private String lastName;

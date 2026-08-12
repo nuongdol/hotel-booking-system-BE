@@ -1,6 +1,8 @@
 package com.example.BookingHotel.service;
 
 import com.example.BookingHotel.model.Room;
+import com.example.BookingHotel.request.RoomRequest;
+import com.example.BookingHotel.response.RoomResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -11,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IRoomService {
-    Room addNewRoom(MultipartFile photo, String roomType, BigDecimal roomPrice) throws SQLException, IOException;
 
+    RoomResponse addNewRoom(RoomRequest roomRequest);
 
     List<String> getAllRoomTypes();
 

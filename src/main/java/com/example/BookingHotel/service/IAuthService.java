@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 public interface IAuthService {
-
     JwtResponse login(@Valid LoginRequest request,
                       HttpServletResponse response);
 }

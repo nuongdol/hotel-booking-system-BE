@@ -26,7 +26,7 @@ public class HotelController {
 
     private final HotelService hotelService;
 
-    @PostMapping("/new-hotel")
+    @PostMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<ApiResponse<HotelResponse>> addHotel(@Valid @RequestBody HotelRequest hotelRequest)
             throws SQLException, IOException {

@@ -46,6 +46,7 @@ public class AuthController {
             UserResponse adminRegister = userService.registerAdmin(admin);
             log.info("Admin:{} {} register the hotel booking website", admin.getFirstName(), admin.getLastName());
             ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
+                    .status("SUCCESS")
                     .data(adminRegister)
                     .code(HttpStatus.CREATED.value())
                     .message("Successful Registration!")

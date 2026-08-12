@@ -28,10 +28,5 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         "AND r.id NOT IN (" +
         "SELECT br.room.id FROM BookedRoom br " +
         "WHERE (br.checkInDate <= :checkOutDate AND br.checkOutDate >= :checkInDate))") // Điều kiện thời gian đã được sửa
-    List<Room> findAvailableRoomsByDatesAndType( LocalDate checkInDate,LocalDate checkOutDate,String roomType);
-
-
-    Set<Room> getRoom(Long hotelId);
-
-    Optional<Set<Room>> findByHotelId(Long hotelId);
+    List<Room> findAvailableRoomsByDatesAndType( LocalDate checkInDate,LocalDate checkOutDate,String roomType);;
 }

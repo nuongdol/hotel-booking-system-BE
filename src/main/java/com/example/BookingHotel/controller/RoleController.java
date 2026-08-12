@@ -36,14 +36,14 @@ public class RoleController {
         try {
             RoleResponse roleSave = roleService.createRole(theRole);
             log.info("Admin {} add new role {} for the system", null, roleSave.getName());
-            ApiResponse<RoleDto> response = ApiResponse.builder()
+            ApiResponse<RoleResponse> response = ApiResponse.<RoleResponse>builder()
                     .data(roleSave)
                     .code(HttpStatus.CREATED.value())
                     .message("New role created successfully!")
                     .build();
             return ResponseEntity.ok(response);
         } catch (RoleAlreadyExistException e) {
-            ApiResponse<RoleResponse> response = ApiResponse.builder()
+            ApiResponse<RoleResponse> response = ApiResponse.<RoleResponse>builder()
                     .code(HttpStatus.CONFLICT.value())
                     .message(e.getMessage())
                     .build();

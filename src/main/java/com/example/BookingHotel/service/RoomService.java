@@ -1,12 +1,17 @@
 package com.example.BookingHotel.service;
 
+import com.example.BookingHotel.constant.ResponseCode;
+import com.example.BookingHotel.exception.BusinessException;
 import com.example.BookingHotel.exception.InternalServerException;
 import com.example.BookingHotel.exception.ResourceNotFoundException;
+import com.example.BookingHotel.mapper.RoomMapper;
 import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.repository.RoomRepository;
+import com.example.BookingHotel.request.RoomRequest;
+import com.example.BookingHotel.response.RoomResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
@@ -19,25 +24,35 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RoomService implements IRoomService {
 
     private final RoomRepository roomRepository;
+    private final RoomMapper roomMapper;
 
     //add new a room
     @Override
-    public Room addNewRoom(MultipartFile file, String roomType, BigDecimal roomPrice) throws SQLException, IOException {
+    public RoomResponse addNewRoom(RoomRequest roomRequest) {
         Room room = new Room();
-        room.setRoomType(roomType);
-        room.setRoomPrice(roomPrice);
-        if (!file.isEmpty()) {
-            byte[] photoBytes = file.getBytes();
+        room.setRoomType(room.getRoomType());
+        room.setRoomPrice(room.getRoomPrice());
+        if(roomRequest.getImageRoom() == null || roomRequest.getImageRoom().isEmpty()){
+            throw new BusinessException(ResponseCode.IMAGE_IS_EMPTY);
+        }
+        try{
+            byte[] photoBytes = roomRequest.getImageRoom().getBytes();
             Blob photoBlob = new SerialBlob(photoBytes);//SerialBlob convert byte to blob
             room.setPhoto(photoBlob);
-
+        }catch (SQLException ex){
+            log.error("Error creating image for room ID: {}",room.getId(), ex);
+            throw new BusinessException(ResponseCode.DATABASE_ERROR);
+        }catch (IOException ex){
+            log.error("File processing error for room ID: {}",room.getId(), ex);
+            throw new BusinessException(ResponseCode.FILE_PROCESSING_ERROR);
         }
-        return roomRepository.save(room);
+        roomRepository.save(room);
+        return roomMapper.toRoomResponse(room);
     }
-
     //lấy loại phòng khác nhau
     @Override
     public List<String> getAllRoomTypes() {

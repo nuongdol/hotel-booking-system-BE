@@ -85,9 +85,9 @@ public class HotelService implements IHotelService {
 
     //get imageHotel of the hotel which you wants
     @Override
-    public byte[] getImageHotelByHotelId(Long HotelId) throws SQLException {
+    public byte[] getImageHotelByHotelId(Long hotelId) throws SQLException {
         //check hotel has exited and get imageHotel and transition
-        Optional<Hotel> theHotel = hotelRepository.findByHotelId(HotelId);
+        Optional<Hotel> theHotel = hotelRepository.findByHotelId(hotelId);
         if (theHotel.isEmpty()) {
             throw new ResourceNotFoundException("Sorry, Hotel not found");
         }
