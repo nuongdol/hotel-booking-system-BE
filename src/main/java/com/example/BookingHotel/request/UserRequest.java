@@ -1,6 +1,7 @@
 package com.example.BookingHotel.request;
 
 import com.example.BookingHotel.model.Role;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ public class UserRequest {
     private String lastName;
 
     @NotNull(message = "email cannot be null")
+    @Email(message = "email must be valid")
     private String email;
 
     @NotNull(message = "password cannot be null")
