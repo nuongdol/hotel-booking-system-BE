@@ -2,6 +2,8 @@ package com.example.BookingHotel.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -11,6 +13,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "room_inventory")
 @Data
+@DynamicInsert
+@DynamicUpdate
 public class RoomInventory {
 
     @Id

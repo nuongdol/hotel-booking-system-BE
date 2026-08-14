@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,6 +17,8 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Table(name = "payment")
+@DynamicInsert
+@DynamicUpdate
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

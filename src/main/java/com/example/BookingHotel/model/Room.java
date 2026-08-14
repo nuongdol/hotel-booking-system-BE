@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -17,6 +19,8 @@ import java.util.List;
 @Setter
 @Getter
 @AllArgsConstructor
+@DynamicInsert
+@DynamicUpdate
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

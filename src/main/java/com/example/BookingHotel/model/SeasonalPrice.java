@@ -4,12 +4,17 @@ package com.example.BookingHotel.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 @Table(name = "seasonal_price")
+@DynamicInsert
+@DynamicUpdate
 public class SeasonalPrice {
 
     @Id

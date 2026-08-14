@@ -5,12 +5,16 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.math.BigDecimal;
 
 @Data
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@DynamicInsert
+@DynamicUpdate
 public class MemberLevel {
 
     @Id

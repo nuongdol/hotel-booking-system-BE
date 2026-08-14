@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 
@@ -13,6 +15,8 @@ import java.time.LocalDate;
 @Table(name = "review")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
+@DynamicInsert
+@DynamicUpdate
 public class Review {
 
     @Id

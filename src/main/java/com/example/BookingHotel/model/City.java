@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.Set;
 @Entity
@@ -12,6 +14,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@DynamicInsert
+@DynamicUpdate
 public class City {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
