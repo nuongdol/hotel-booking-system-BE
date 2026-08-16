@@ -3,9 +3,7 @@ package com.example.BookingHotel.service;
 import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.request.RoomRequest;
 import com.example.BookingHotel.response.RoomResponse;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;

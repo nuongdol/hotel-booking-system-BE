@@ -2,9 +2,7 @@ package com.example.BookingHotel.repository;
 
 import com.example.BookingHotel.model.Hotel;
 import com.example.BookingHotel.request.HotelDto;
-import com.example.BookingHotel.response.HotelResponse;
 import com.example.BookingHotel.sql.SQLHotel;
-import com.example.BookingHotel.sql.SQLInventory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

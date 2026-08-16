@@ -1,7 +1,6 @@
 package com.example.BookingHotel.service;
 
 import com.example.BookingHotel.model.Hotel;
-import com.example.BookingHotel.request.HotelDto;
 import com.example.BookingHotel.request.HotelRequest;
 import com.example.BookingHotel.response.HotelResponse;
 import org.springframework.web.multipart.MultipartFile;

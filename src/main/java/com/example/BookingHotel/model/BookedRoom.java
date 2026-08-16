@@ -80,7 +80,7 @@ public class BookedRoom {
     @Column(name = "booking_confirmation_Code")
     private String bookingConfirmationCode;//ma dat phong
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "room_id")
     private Room room;
 

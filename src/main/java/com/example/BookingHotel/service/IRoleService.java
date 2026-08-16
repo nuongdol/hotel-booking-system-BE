@@ -6,7 +6,6 @@ import com.example.BookingHotel.request.RoleDto;
 import com.example.BookingHotel.response.RoleResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 
 public interface IRoleService {

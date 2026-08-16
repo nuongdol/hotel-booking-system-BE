@@ -88,6 +88,10 @@ public class JwtUtils {
         return extractClaims(refreshToken, Claims::getExpiration);
     }
 
+    public boolean isTokenValid(String token) {
+        return extractClaims(token, Claims::getExpiration).before(new Date());
+    }
+
     private <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key())
@@ -95,5 +99,9 @@ public class JwtUtils {
                 .parseClaimsJws(token)
                 .getBody();
         return claimsResolver.apply(claims);
+    }
+
+    public String extractEmail(String token) {
+        return extractClaims(token, claims -> claims.get("email", String.class));
     }
 }

@@ -1,7 +1,6 @@
 package com.example.BookingHotel.response;
 
 import com.example.BookingHotel.model.City;
-import com.example.BookingHotel.model.Room;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
