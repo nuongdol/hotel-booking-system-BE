@@ -59,7 +59,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/register-user", "/rooms/**", "/bookings/**", "/roles/**", "/hotels/**").permitAll()
                         .requestMatchers("/role/**").hasRole("ADMIN")
-                        .requestMatchers("/swagger-ui/**, /swagger-ui.html, /v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -11,14 +11,14 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
 
-spring:
-  profiles:
-    active: prod
+#spring:
+#  profiles:
+#    active: prod
 
 open:
   api:
     title: API document
     version: v1.0.0.0
     description: API booking hotel system
-    serverUrl: http://localhost:8081
+    serverUrl: http://localhost:9192
     serverName: server test
