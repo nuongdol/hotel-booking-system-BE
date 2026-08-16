@@ -7,6 +7,7 @@ import com.example.BookingHotel.response.JwtResponse;
 import com.example.BookingHotel.response.UserResponse;
 import com.example.BookingHotel.service.IAuthService;
 import com.example.BookingHotel.service.IUserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -30,6 +31,7 @@ public class AuthController {
 
 
     @PostMapping("/register-user")
+    @Operation(description = "register for user")
     public ResponseEntity<ApiResponse<UserResponse>> registerUser(@Valid @RequestBody UserRequest user) {
         UserResponse userRegister = userService.registerUser(user);
         log.info("User:{} {} register the hotel booking website", user.getFirstName(), user.getLastName());
@@ -43,6 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/register-admin")
+    @Operation(description = "register for admin")
     public ResponseEntity<ApiResponse<UserResponse>> registerAdmin(@Valid @RequestBody UserRequest admin) {
         UserResponse adminRegister = userService.registerAdmin(admin);
         log.info("Admin:{} {} register the hotel booking website", admin.getFirstName(), admin.getLastName());
@@ -56,6 +59,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(description = "login")
     public ResponseEntity<ApiResponse<JwtResponse>> authenticateUser(@Valid @RequestBody LoginRequest request,
                                                                      HttpServletResponse response) {
         log.info("User login with email:{}", request.getEmail());
@@ -73,12 +77,14 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @Operation(description = "logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         authService.logout(request, response);
         return ResponseEntity.ok("Logout successfully!");
     }
 
     @PostMapping("/refresh-token")
+    @Operation(description = "get accessToken from using refresh token")
     public ResponseEntity<ApiResponse<JwtResponse>> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         JwtResponse accessToken = authService.refreshToken(request, response);
         //add accessToken vào header
@@ -87,7 +93,6 @@ public class AuthController {
                     + accessToken.getAccessToken());
             log.info("accessToken:{} is created by refreshToken", accessToken.getAccessToken());
         }
-
         ApiResponse<JwtResponse> apiResponse = ApiResponse.<JwtResponse>builder()
                 .status("SUCCESS")
                 .data(accessToken)
