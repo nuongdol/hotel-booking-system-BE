@@ -10,14 +10,12 @@ import com.example.BookingHotel.repository.UserRepository;
 import com.example.BookingHotel.request.MailBody;
 import com.example.BookingHotel.request.ResetPasswordRequest;
 import com.example.BookingHotel.request.UserRequest;
-import com.example.BookingHotel.response.ResetPasswordResponse;
 import com.example.BookingHotel.response.UserResponse;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -104,7 +102,7 @@ public class UserService implements IUserService {
     @Override
     public User getUser(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
     }
 
     @Override
