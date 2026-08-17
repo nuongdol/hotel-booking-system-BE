@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-//@CrossOrigin("http://localhost:5173")
+@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/v1/booking")
 public class BookingController {
 

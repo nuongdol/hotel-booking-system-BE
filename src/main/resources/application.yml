@@ -22,3 +22,15 @@ open:
     description: API booking hotel system
     serverUrl: http://localhost:9192
     serverName: server test
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${USER_NAME_EMAIL}
+    password: ${PASSWORD_EMAIL}
+    mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
