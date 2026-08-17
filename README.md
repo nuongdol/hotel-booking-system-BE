@@ -48,11 +48,7 @@ The backend is designed using a layered architecture with Spring Boot, Spring Da
 - **MySQL** - persistent data storage
 - **Redis** - temporary room holding and distributed locking
 - **Redisson** - Redis-based distributed lock
-
-### Payment
-
-- **VNPay**
-
+  
 ### Development Tools
 
 - Maven
