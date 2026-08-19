@@ -9,6 +9,7 @@ import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.RoomResponse;
 import com.example.BookingHotel.service.BookingService;
 import com.example.BookingHotel.service.IRoomService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,15 +34,15 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-//@CrossOrigin("http://localhost:5173")
 @RequestMapping("/api/v1/rooms")
 public class RoomController {
     private final IRoomService roomService;
     private final BookingService bookingService;
 
     @PostMapping()
-    @PreAuthorize("hasRole('ROLE_ADMIN','ROLE_OWNER')")
-    public ResponseEntity<ApiResponse<RoomResponse>> addNewRoom(@Valid @RequestBody RoomRequest roomRequest){
+    @Operation(description = "created a new room")
+//    @PreAuthorize("hasRole('ROLE_ADMIN','ROLE_OWNER')")
+    public ResponseEntity<ApiResponse<RoomResponse>> addNewRoom(@Valid @ModelAttribute RoomRequest roomRequest){
         RoomResponse saveRoom = roomService.addNewRoom(roomRequest);
         log.info("add new room: {}",saveRoom);
         ApiResponse<RoomResponse> response = ApiResponse.<RoomResponse>builder()
@@ -87,7 +88,7 @@ public class RoomController {
 
     //cập nhật phòng
     @PutMapping("/{roomId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN', 'ROLE_OWNER')")
+//    @PreAuthorize("hasRole('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long roomId,
                                                    @RequestParam(required = false) String roomType,
                                                    @RequestParam(required = false) BigDecimal roomPrice,

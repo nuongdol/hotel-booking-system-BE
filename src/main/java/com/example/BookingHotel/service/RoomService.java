@@ -34,8 +34,8 @@ public class RoomService implements IRoomService {
     @Override
     public RoomResponse addNewRoom(RoomRequest roomRequest) {
         Room room = new Room();
-        room.setRoomType(room.getRoomType());
-        room.setRoomPrice(room.getRoomPrice());
+        room.setRoomType(roomRequest.getRoomType());
+        room.setRoomPrice(roomRequest.getRoomPrice());
         if(roomRequest.getImageRoom() == null || roomRequest.getImageRoom().isEmpty()){
             throw new BusinessException(ResponseCode.IMAGE_IS_EMPTY);
         }

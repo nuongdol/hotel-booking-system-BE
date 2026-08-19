@@ -10,14 +10,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class HotelUserDetails extends User implements UserDetails {
+public class HotelUserDetails implements UserDetails {
     private Long id;
     private  String email;
     private String password;
@@ -37,6 +39,9 @@ public class HotelUserDetails extends User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        //add roles
+        //add permission
         return authorities;
     }
 
