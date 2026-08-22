@@ -56,6 +56,9 @@ public class Hotel {
     @JoinColumn(name = "id_city", nullable = false)
     private City city;
 
+    @Column(name = "location")
+    private String location;
+
     public Hotel(Long hotelId, String nameHotel, String addressHotel, Blob imageHotel, float rateHotel, Set<Room> rooms, City city) {
         this.hotelId = hotelId;
         this.nameHotel = nameHotel;

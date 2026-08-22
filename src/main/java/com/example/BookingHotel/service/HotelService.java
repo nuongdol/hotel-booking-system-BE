@@ -44,7 +44,7 @@ public class HotelService implements IHotelService {
     public Hotel addHotel(HotelRequest hotelRequest) throws SQLException, IOException {
         //save city
         City city = new City();
-        city.setNameCity(hotelRequest.getNameHotel());
+        city.setName(hotelRequest.getNameHotel());
         City citySave = cityRepository.save(city);
         //save hotel
         Hotel hotel = new Hotel();
@@ -132,7 +132,7 @@ public class HotelService implements IHotelService {
                 .rooms(hotel.getRooms().stream()
                         .map(roomMapper::toRoomResponse)
                         .collect(Collectors.toSet()))
-                .cityName(hotel.getCity() != null ? hotel.getCity().getNameCity() : null)
+                .cityName(hotel.getCity() != null ? hotel.getCity().getName() : null)
                 .build();
     }
 
@@ -162,7 +162,7 @@ public class HotelService implements IHotelService {
                 .rooms(hotel.getRooms().stream()
                         .map(roomMapper::toRoomResponse)
                         .collect(Collectors.toSet()))
-                .cityName(hotel.getCity().getNameCity())
+                .cityName(hotel.getCity().getName())
                 .build();
     }
 
@@ -187,7 +187,7 @@ public class HotelService implements IHotelService {
                     .addressHotel(updateHotel.getAddressHotel())
                     .rateHotel(updateHotel.getRateHotel())
                     .imageHotel(imageUrl)
-                    .cityName(updateHotel.getCity() != null ? updateHotel.getCity().getNameCity() : null)
+                    .cityName(updateHotel.getCity() != null ? updateHotel.getCity().getName() : null)
                     .rooms(updateHotel.getRooms().stream()
                             .map(roomMapper::toRoomResponse)
                             .collect(Collectors.toSet()))

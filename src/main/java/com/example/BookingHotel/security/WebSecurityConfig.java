@@ -61,6 +61,7 @@ public class WebSecurityConfig {
                                 , "/api/v1/role/**", "/api/v1/hotels/**", "/api/v1/auth/login").permitAll()
                         .requestMatchers("/role/**").hasRole("ADMIN")
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/v1/city/**").permitAll()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);

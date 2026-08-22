@@ -1,14 +1,19 @@
 package com.example.BookingHotel.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 import java.util.HashSet;
 
 @Entity
 @Table(name = "permission")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Permission {
 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "permission_id")
     private Long permissionId;

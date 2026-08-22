@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 @Entity
 @AllArgsConstructor
@@ -21,10 +22,25 @@ public class City {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "city_id")
     private Long cityId;
-
-    @Column(name="name_city")
-    private String nameCity;
     //1-n
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Hotel> hotel;
+
+    @Column(unique = true, name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name= "province")
+    private String province;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }
