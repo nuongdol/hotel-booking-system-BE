@@ -36,5 +36,14 @@ public class Review {
     @Column(name = "review_date")
     LocalDate reviewDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hotel_id", nullable = false)
+    private Hotel hotel;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name = "comment")
+    private String comment;
 }

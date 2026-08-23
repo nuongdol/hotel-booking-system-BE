@@ -5,6 +5,7 @@ import com.example.BookingHotel.dto.CityDto;
 import com.example.BookingHotel.exception.BusinessException;
 import com.example.BookingHotel.repository.CityRepository;
 import com.example.BookingHotel.response.CityResponse;
+import com.example.BookingHotel.response.DetailCityResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,9 +35,18 @@ public class CityService implements ICityService{
             response.setMinPrice(city.getMinPrice());
             return response;
         }).toList();
-        if(lstCityResponse.isEmpty()){
+        if(lstCityResponse == null || lstCityResponse.isEmpty()){
             throw new BusinessException(ResponseCode.CITY_HAVE_NOT_HOTEL);
         }
         return lstCityResponse;
+    }
+
+    @Override
+    public List<DetailCityResponse> getDetailCheapestCity(Long cityId) {
+        List<DetailCityResponse> responses = cityRepository.getDetailCheapestCity(cityId);
+        if(responses == null || responses.isEmpty()){
+            throw new BusinessException(ResponseCode.CHEAPEST_ROOM_NOT_FOUND);
+        }
+        return responses;
     }
 }

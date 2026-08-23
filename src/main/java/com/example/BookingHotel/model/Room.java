@@ -55,6 +55,9 @@ public class Room {
     @Column(name = "max_adults")
     private Integer maxAdults;
 
+    @OneToMany(mappedBy = "room",cascade = CascadeType.ALL)
+    private List<RoomRatePlans> roomRatePlans;
+
     public Room() {
         this.bookings = new ArrayList<>();
         //khoi tao danh sach dat phong

@@ -2,6 +2,7 @@ package com.example.BookingHotel.controller;
 
 import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.CityResponse;
+import com.example.BookingHotel.response.DetailCityResponse;
 import com.example.BookingHotel.service.ICityService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,5 +35,24 @@ public class CityController {
                 .status("SUCCESS")
                 .build();
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{cityId}/rooms/cheapest")
+    @Operation(description = "lay phong co gia re nhat cua moi khach san trong thanh pho")
+    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> getDetailCheapestCity(@PathVariable("cityId") Long cityId){
+        List<DetailCityResponse> responses = cityService.getDetailCheapestCity(cityId);
+        ApiResponse<List<DetailCityResponse>> apiResponse = ApiResponse.<List<DetailCityResponse>>builder()
+                .status("SUCCESS")
+                .code(HttpStatus.OK.value())
+                .data(responses)
+                .message("Get list detail cheapest city successfully!")
+                .build();
+            return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/{cityId}/rooms/popular")
+    @Operation(description = "lay phong dung pho bien nhat cua moi khach san trong thanh pho")
+    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> getDetailPopularCity(){
+        return null;
     }
 }

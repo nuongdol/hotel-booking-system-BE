@@ -72,7 +72,7 @@ public class BookedRoom {
     @Column(name = "customer_id",insertable = false, updatable = false)
     private Long customerId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id")
     private User user;
 
@@ -95,6 +95,10 @@ public class BookedRoom {
 
     @Column(name = "ip_address")
     private String ipAddress;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_rate_plans_id")
+    private RoomRatePlans roomRatePlans;
 
     public void calculateTotalNumberOfGuest(){
 

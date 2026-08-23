@@ -10,6 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.sql.Blob;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 @Entity
 @Data
@@ -58,6 +59,21 @@ public class Hotel {
 
     @Column(name = "location")
     private String location;
+
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Review> reviews;
+
+    @Column(name = "ward")
+    private String ward;
+
+    @Column(name = "district")
+    private String district;
+
+    @Column(name = "latitude")
+    private String latitude;
+
+    @Column(name = "longitude")
+    private String longitude;
 
     public Hotel(Long hotelId, String nameHotel, String addressHotel, Blob imageHotel, float rateHotel, Set<Room> rooms, City city) {
         this.hotelId = hotelId;
