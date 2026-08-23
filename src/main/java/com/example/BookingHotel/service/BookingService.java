@@ -190,7 +190,7 @@ public class BookingService implements IBookingService {
         //tạo một mã code cho giữ chỗ cho khach hang
         String bookingCode = UUID.randomUUID().toString();
         boolean holdRoomSuccess = holdRoom(roomId, bookingRequest.getCheckInDate(),
-                bookingRequest.getCheckOutDate(), bookingCode, roomInventory.getBookedRoom());
+                bookingRequest.getCheckOutDate(), bookingCode, roomInventory.getQuantityOfBookedRoom());
         if (!holdRoomSuccess) {
             throw new BusinessException(ResponseCode.BOOKED_ROOM_INVALID);
         }

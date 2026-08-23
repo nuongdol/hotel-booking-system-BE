@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "promotions")
@@ -41,4 +42,7 @@ public class Promotions {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_rate_plan_id")
     private RoomRatePlans roomRatePlans;
+
+    @OneToMany(mappedBy = "promotions", cascade = CascadeType.ALL)
+    private List<Vouchers> vouchers;
 }

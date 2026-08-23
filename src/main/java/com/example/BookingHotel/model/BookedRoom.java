@@ -11,6 +11,10 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -84,7 +88,7 @@ public class BookedRoom {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @OneToOne(mappedBy = "booking")
+    @OneToOne(mappedBy = "booking",cascade = CascadeType.ALL)
     private Payment payment;
 
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
@@ -99,6 +103,12 @@ public class BookedRoom {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_rate_plans_id")
     private RoomRatePlans roomRatePlans;
+
+    @OneToMany(mappedBy = "bookedRoom", cascade = CascadeType.ALL)
+    private Set<AddOnServices> addOnServices;
+
+    @ManyToMany(mappedBy = "bookedRooms")
+    private Set<Vouchers> vouchers = new HashSet<>();
 
     public void calculateTotalNumberOfGuest(){
 

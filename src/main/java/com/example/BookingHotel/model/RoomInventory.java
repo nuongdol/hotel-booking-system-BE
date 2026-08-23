@@ -29,8 +29,8 @@ public class RoomInventory {
     private Integer stock;
 
     //số lượng phòng được đặt
-    @Column(name = "booked_room")
-    private Integer bookedRoom;
+    @Column(name = "quantity")
+    private Integer quantityOfBookedRoom;
 
     //hệ số giá, tăng giá vào cuối tuan/le tết
     @Column(name = "price_multiplier")
