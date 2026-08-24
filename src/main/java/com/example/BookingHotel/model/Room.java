@@ -41,6 +41,9 @@ public class Room {
     @Column(name = "photo")
     private Blob photo;
 
+    @Column(name = "image")
+    private String image;
+
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BookedRoom> bookings;
 

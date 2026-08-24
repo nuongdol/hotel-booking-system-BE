@@ -31,6 +31,9 @@ public class Vouchers {
     @JoinColumn(name = "promotion_id")
     private Promotions promotions;
 
+    @Column(name = "quantity_limited")
+    private Long quantityLimited;
+
     //n bookings - n vouchers
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

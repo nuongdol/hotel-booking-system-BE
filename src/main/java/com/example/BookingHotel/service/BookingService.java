@@ -6,10 +6,13 @@ import com.example.BookingHotel.exception.ResourceNotFoundException;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.model.RoomInventory;
+import com.example.BookingHotel.model.User;
 import com.example.BookingHotel.repository.BookingRepository;
 import com.example.BookingHotel.repository.RoomInventoryRepository;
 import com.example.BookingHotel.request.InitPaymentRequest;
 import com.example.BookingHotel.response.BookingResponse;
+import com.example.BookingHotel.response.InformationBookingRoom;
+import com.example.BookingHotel.util.AuthUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -104,6 +107,19 @@ public class BookingService implements IBookingService {
                 statusResponse = "no_show";
         }
         return statusResponse;
+    }
+
+    @Override
+    public InformationBookingRoom getInformationBookingRoom(Long roomId) {
+        User bookingUser = AuthUtils.getCurrentUser();
+        if(bookingUser == null){
+            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
+        }
+        InformationBookingRoom response = bookingRepository.getInformationBookingRoom(roomId, bookingUser.getId());
+        if(response == null){
+            throw new BusinessException(ResponseCode.INFORMATION_BOOKING_IS_NULL);
+        }
+        return response;
     }
 
     public boolean holdRoom(Long roomId, LocalDate checkIn,

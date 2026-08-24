@@ -2,6 +2,7 @@ package com.example.BookingHotel.service;
 
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.response.BookingResponse;
+import com.example.BookingHotel.response.InformationBookingRoom;
 
 import java.util.List;
 public interface IBookingService {
@@ -18,4 +19,6 @@ public interface IBookingService {
     BookingResponse markBooked(Long bookingId);
 
     String getBookingStatus(Long bookingId);
+
+    InformationBookingRoom getInformationBookingRoom(Long roomId);
 }

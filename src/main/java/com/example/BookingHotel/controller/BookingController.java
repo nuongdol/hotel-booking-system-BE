@@ -4,11 +4,14 @@ package com.example.BookingHotel.controller;
 import com.example.BookingHotel.exception.InvalidBookingRequestException;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
+import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.BookingResponse;
+import com.example.BookingHotel.response.InformationBookingRoom;
 import com.example.BookingHotel.response.RoomResponse;
 import com.example.BookingHotel.service.IBookingService;
 import com.example.BookingHotel.service.IRoomService;
 import com.example.BookingHotel.util.RequestUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +69,20 @@ public class BookingController {
         } catch (InvalidBookingRequestException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    //checkout summary(lay thong tin tong quan cua nguoi dat phong tron session)
+    @GetMapping("/checkout-summary/{roomId}")
+    @Operation(description = "lay thong tin tong quan cua nguoi dat phong tron session")
+    public ResponseEntity<ApiResponse<InformationBookingRoom>> checkSummary(@PathVariable("roomId") Long roomId) {
+        InformationBookingRoom informationBookingRoom = bookingService.getInformationBookingRoom(roomId);
+        ApiResponse<InformationBookingRoom> apiResponse = ApiResponse.<InformationBookingRoom>builder()
+                .message("Get information booking room of user")
+                .code(HttpStatus.OK.value())
+                .data(informationBookingRoom)
+                .status("200")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @DeleteMapping("/{bookingId}")
