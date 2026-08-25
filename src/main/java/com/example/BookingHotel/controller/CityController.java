@@ -24,7 +24,7 @@ public class CityController {
 
     private final ICityService cityService;
 
-    @GetMapping(" ")
+    @GetMapping()
     @Operation(description = "lay thanh pho du lich")
     public ResponseEntity<ApiResponse<List<CityResponse>>> getCity() {
         List<CityResponse> lstCity = cityService.getCity();

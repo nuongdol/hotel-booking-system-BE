@@ -6,6 +6,7 @@ import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.request.RoomRequest;
 import com.example.BookingHotel.response.ApiResponse;
+import com.example.BookingHotel.response.DetailCityResponse;
 import com.example.BookingHotel.response.RoomResponse;
 import com.example.BookingHotel.service.BookingService;
 import com.example.BookingHotel.service.IRoomService;
@@ -27,6 +28,7 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -158,6 +160,24 @@ public class RoomController {
     private List<BookedRoom> getAllBookingsByRoomId(Long roomId) {
         return bookingService.getAllBookingsByRoomId(roomId);
 
+    }
+
+    //tìm kiếm phòng khach sạn cua user
+    @PostMapping("/research")
+    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> searchListRoom(@RequestParam("city") String city,
+                                                                          @RequestParam("checkInDate")LocalDateTime checkInDate,
+                                                                          @RequestParam("totalNights") Integer totalNights,
+                                                                          @RequestParam("adults") Integer adults,
+                                                                          @RequestParam("children") Integer children){
+
+            List<DetailCityResponse> lstRoom = roomService.searchListRoom(city, checkInDate, totalNights, adults, children);
+            ApiResponse<List<DetailCityResponse>> apiResponse = ApiResponse.<List<DetailCityResponse>> builder()
+                    .status("200")
+                    .code(HttpStatus.OK.value())
+                    .message("Search List Room Successfully!")
+                    .data(lstRoom)
+                    .build();
+            return ResponseEntity.ok(apiResponse);
     }
 
 }

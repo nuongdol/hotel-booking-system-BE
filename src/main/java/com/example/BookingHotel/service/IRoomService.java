@@ -2,11 +2,13 @@ package com.example.BookingHotel.service;
 
 import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.request.RoomRequest;
+import com.example.BookingHotel.response.DetailCityResponse;
 import com.example.BookingHotel.response.RoomResponse;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,5 +29,7 @@ public interface IRoomService {
     Optional<Room> getRoomById(Long roomId);
 
     List<Room> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
+
+    List<DetailCityResponse> searchListRoom(String city, LocalDateTime checkInDate, Integer totalNights, Integer adults, Integer children);
 }
 

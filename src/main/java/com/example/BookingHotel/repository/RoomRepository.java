@@ -1,6 +1,8 @@
 package com.example.BookingHotel.repository;
 
 import com.example.BookingHotel.model.Room;
+import com.example.BookingHotel.response.DetailCityResponse;
+import com.example.BookingHotel.sql.SQLRoom;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,4 +31,11 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         "SELECT br.room.id FROM BookedRoom br " +
         "WHERE (br.checkInDate <= :checkOutDate AND br.checkOutDate >= :checkInDate))") // Điều kiện thời gian đã được sửa
     List<Room> findAvailableRoomsByDatesAndType( LocalDate checkInDate,LocalDate checkOutDate,String roomType);;
+
+    @Query(nativeQuery = true, value = SQLRoom.SEARCH_LIST_ROOM)
+    List<DetailCityResponse> searchListRoom(@Param("city") String city,
+                                            @Param("checkInDate") LocalDateTime checkInDate,
+                                            @Param("totalNights") Integer totalNights,
+                                            @Param("adults") Integer adults,
+                                            @Param("children") Integer children);
 }

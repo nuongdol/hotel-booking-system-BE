@@ -8,6 +8,7 @@ import com.example.BookingHotel.mapper.RoomMapper;
 import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.repository.RoomRepository;
 import com.example.BookingHotel.request.RoomRequest;
+import com.example.BookingHotel.response.DetailCityResponse;
 import com.example.BookingHotel.response.RoomResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -117,5 +119,17 @@ public class RoomService implements IRoomService {
     @Override
     public List<Room> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, String roomType) {
         return roomRepository.findAvailableRoomsByDatesAndType(checkInDate, checkOutDate, roomType);
+    }
+
+    @Override
+    public List<DetailCityResponse> searchListRoom(String city, LocalDateTime checkInDate, Integer totalNights, Integer adults, Integer children) {
+        List<DetailCityResponse> responses = roomRepository.searchListRoom(city, checkInDate, totalNights, adults, children);
+        if(responses.isEmpty()){
+            throw new BusinessException(ResponseCode.LIST_ROOM_IS_EMPTY);
+        }
+        if(responses == null){
+            throw new BusinessException(ResponseCode.LIST_ROOM_IS_NULL);
+        }
+        return responses;
     }
 }
