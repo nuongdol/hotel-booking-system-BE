@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/voucher")
 public class VoucherController {
 
-    @PostMapping("/apply")
-    @Operation(description = "áp dung voucher cho booking")
-
-    @DeleteMapping("/remove")
-    @Operation(description = "Huỷ mã giảm giá")
+//    @PostMapping("/apply")
+//    @Operation(description = "áp dung voucher cho booking")
+//
+//    @DeleteMapping("/remove")
+//    @Operation(description = "Huỷ mã giảm giá")
 
 }

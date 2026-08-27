@@ -4,6 +4,7 @@ import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.response.BookingResponse;
 import com.example.BookingHotel.response.InformationBookingRoom;
 
+import java.time.LocalDateTime;
 import java.util.List;
 public interface IBookingService {
     BookedRoom findByBookingConfirmationCode(String confirmationCode);
@@ -20,5 +21,6 @@ public interface IBookingService {
 
     String getBookingStatus(Long bookingId);
 
-    InformationBookingRoom getInformationBookingRoom(Long roomId);
+    InformationBookingRoom getInformationBookingRoom(Long roomId, String city, LocalDateTime checkInDate,
+                                                     Integer totalNights, Integer adults, Integer children);
 }

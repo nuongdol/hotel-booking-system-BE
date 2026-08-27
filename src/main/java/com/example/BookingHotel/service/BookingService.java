@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -110,12 +111,15 @@ public class BookingService implements IBookingService {
     }
 
     @Override
-    public InformationBookingRoom getInformationBookingRoom(Long roomId) {
+    public InformationBookingRoom getInformationBookingRoom(Long roomId, String city, LocalDateTime checkInDate,
+                                                            Integer totalNights, Integer adults, Integer children) {
         User bookingUser = AuthUtils.getCurrentUser();
         if(bookingUser == null){
             throw new BusinessException(ResponseCode.USER_NOT_FOUND);
         }
-        InformationBookingRoom response = bookingRepository.getInformationBookingRoom(roomId, bookingUser.getId());
+        LocalDateTime checkOutDate = checkInDate.plusDays(totalNights);
+        InformationBookingRoom response = bookingRepository.getInformationBookingRoom(roomId, bookingUser.getId(), city,
+                checkInDate, checkOutDate, adults, children);
         if(response == null){
             throw new BusinessException(ResponseCode.INFORMATION_BOOKING_IS_NULL);
         }

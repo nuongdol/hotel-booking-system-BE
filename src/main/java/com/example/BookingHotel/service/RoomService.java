@@ -123,7 +123,8 @@ public class RoomService implements IRoomService {
 
     @Override
     public List<DetailCityResponse> searchListRoom(String city, LocalDateTime checkInDate, Integer totalNights, Integer adults, Integer children) {
-        List<DetailCityResponse> responses = roomRepository.searchListRoom(city, checkInDate, totalNights, adults, children);
+        LocalDateTime checkOutDate = checkInDate.plusDays(totalNights);
+        List<DetailCityResponse> responses = roomRepository.searchListRoom(city, checkInDate, checkOutDate, adults, children);
         if(responses.isEmpty()){
             throw new BusinessException(ResponseCode.LIST_ROOM_IS_EMPTY);
         }

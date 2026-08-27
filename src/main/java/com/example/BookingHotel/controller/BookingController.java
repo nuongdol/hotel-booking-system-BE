@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.module.ResolutionException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,8 +75,13 @@ public class BookingController {
     //checkout summary(lay thong tin tong quan cua nguoi dat phong tron session)
     @GetMapping("/checkout-summary/{roomId}")
     @Operation(description = "lay thong tin tong quan cua nguoi dat phong tron session")
-    public ResponseEntity<ApiResponse<InformationBookingRoom>> checkSummary(@PathVariable("roomId") Long roomId) {
-        InformationBookingRoom informationBookingRoom = bookingService.getInformationBookingRoom(roomId);
+    public ResponseEntity<ApiResponse<InformationBookingRoom>> checkSummary(@PathVariable("roomId") Long roomId,
+                                                                            @RequestParam("city") String city,
+                                                                            @RequestParam("checkInDate") LocalDateTime checkInDate,
+                                                                            @RequestParam("totalNights") Integer totalNights,
+                                                                            @RequestParam("adults") Integer adults,
+                                                                            @RequestParam("children") Integer children) {
+        InformationBookingRoom informationBookingRoom = bookingService.getInformationBookingRoom(roomId,city, checkInDate, totalNights, adults, children);
         ApiResponse<InformationBookingRoom> apiResponse = ApiResponse.<InformationBookingRoom>builder()
                 .message("Get information booking room of user")
                 .code(HttpStatus.OK.value())

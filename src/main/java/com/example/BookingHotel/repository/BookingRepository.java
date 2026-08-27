@@ -5,8 +5,10 @@ import com.example.BookingHotel.response.InformationBookingRoom;
 import com.example.BookingHotel.sql.SQLBooking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,5 +25,9 @@ public interface BookingRepository extends JpaRepository<BookedRoom, Long> {
     Optional<BookedRoom> findByBookingId(Long bookingId);
 
     @Query(nativeQuery = true, value = SQLBooking.INFORMATION_BOOKING_ROOM)
-    InformationBookingRoom getInformationBookingRoom(Long roomId, Long id);
+    InformationBookingRoom getInformationBookingRoom(@Param("roomId") Long roomId, @Param("id")Long id,
+                                                     @Param("city") String city,
+                                                     @Param("checkInDate") LocalDateTime checkInDate,
+                                                     @Param("checkOutDate")LocalDateTime checkOutDate,
+                                                     @Param("adults") Integer adults, @Param("children")Integer children);
 }

@@ -30,9 +30,6 @@ public class Vouchers {
     @JoinColumn(name = "promotion_id")
     private Promotions promotions;
 
-    @Column(name = "quantity_limited")
-    private Long quantityLimited;
-
     //n bookings - n vouchers
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -41,4 +38,10 @@ public class Vouchers {
             inverseJoinColumns = @JoinColumn(name = "booking_id", referencedColumnName = "booking_id")
     )
     private Set<BookedRoom> bookedRooms = new HashSet<>();
+
+    @Column(name = "used_voucher_count")
+    private Integer usedVoucherCount;
+
+    @Column(name = "usage_limit")
+    private Integer usageLimit;
 }

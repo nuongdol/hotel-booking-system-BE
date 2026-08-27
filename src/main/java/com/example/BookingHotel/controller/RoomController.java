@@ -44,9 +44,9 @@ public class RoomController {
     @PostMapping()
     @Operation(description = "created a new room")
 //    @PreAuthorize("hasRole('ROLE_ADMIN','ROLE_OWNER')")
-    public ResponseEntity<ApiResponse<RoomResponse>> addNewRoom(@Valid @ModelAttribute RoomRequest roomRequest){
+    public ResponseEntity<ApiResponse<RoomResponse>> addNewRoom(@Valid @ModelAttribute RoomRequest roomRequest) {
         RoomResponse saveRoom = roomService.addNewRoom(roomRequest);
-        log.info("add new room: {}",saveRoom);
+        log.info("add new room: {}", saveRoom);
         ApiResponse<RoomResponse> response = ApiResponse.<RoomResponse>builder()
                 .message("Add new room")
                 .status("SUCCESS")
@@ -57,7 +57,7 @@ public class RoomController {
     }
 
     @GetMapping("/type")
-    public List<String> getRoomType(){
+    public List<String> getRoomType() {
         return roomService.getAllRoomTypes();
     }
 
@@ -66,9 +66,9 @@ public class RoomController {
     public ResponseEntity<List<RoomResponse>> getAllRooms() throws SQLException {
         List<Room> rooms = roomService.getAllRoom();
         List<RoomResponse> roomResponses = new ArrayList<>();
-        for(Room room : rooms){
+        for (Room room : rooms) {
             byte[] photoBytes = roomService.getRoomPhotoByRoomId(room.getId());
-            if(photoBytes != null && photoBytes.length > 0){
+            if (photoBytes != null && photoBytes.length > 0) {
                 String base64Photo = Base64.encodeBase64String(photoBytes);
                 RoomResponse roomResponse = getRoomResponse(room);
                 roomResponse.setPhoto(base64Photo);
@@ -83,18 +83,18 @@ public class RoomController {
     //xoá phòng
     @DeleteMapping("/delete/room/{roomId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteRoom(@PathVariable("roomId") Long roomId){
+    public ResponseEntity<Void> deleteRoom(@PathVariable("roomId") Long roomId) {
         roomService.deleteRoom(roomId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     //cập nhật phòng
     @PutMapping("/{roomId}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN', 'ROLE_OWNER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN', 'ROLE_OWNER')")
     public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long roomId,
                                                    @RequestParam(required = false) String roomType,
                                                    @RequestParam(required = false) BigDecimal roomPrice,
-                                                   @RequestParam(required = false)MultipartFile photo) throws IOException, SQLException {
+                                                   @RequestParam(required = false) MultipartFile photo) throws IOException, SQLException {
         byte[] photoBytes = photo != null && !photo.isEmpty() ?
                 photo.getBytes() : roomService.getRoomPhotoByRoomId(roomId);
         Blob photoBlob = photoBytes != null && photoBytes.length > 0 ? new SerialBlob(photoBytes) : null;
@@ -106,37 +106,34 @@ public class RoomController {
 
     //lấy id mã phòng
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<Optional<RoomResponse>> getRoomById(@PathVariable Long roomId){
+    public ResponseEntity<Optional<RoomResponse>> getRoomById(@PathVariable Long roomId) {
         Optional<Room> theRoom = roomService.getRoomById(roomId);
         return theRoom.map(room -> {
             RoomResponse roomResponse = getRoomResponse(room);
             return ResponseEntity.ok(Optional.of(roomResponse));
-        }).orElseThrow(()->new ResourceNotFoundException("Room not found."));
+        }).orElseThrow(() -> new ResourceNotFoundException("Room not found."));
     }
 
     //Lấy phòng phù hợp
     @GetMapping("/available-rooms")
-    public ResponseEntity<List<RoomResponse>> getAvailableRooms(@RequestParam("checkInDate")@DateTimeFormat(pattern = "yyyy.MM.dd")LocalDate checkInDate ,
-                                                                @RequestParam("checkOutDate")@DateTimeFormat(pattern = "yyyy.MM.dd")LocalDate checkOutDate,
+    public ResponseEntity<List<RoomResponse>> getAvailableRooms(@RequestParam("checkInDate") @DateTimeFormat(pattern = "yyyy.MM.dd") LocalDate checkInDate,
+                                                                @RequestParam("checkOutDate") @DateTimeFormat(pattern = "yyyy.MM.dd") LocalDate checkOutDate,
                                                                 @RequestParam("roomType") String roomType) throws SQLException {
-
-
         List<Room> availableRooms = roomService.getAvailableRooms(checkInDate, checkOutDate, roomType);
         List<RoomResponse> roomResponses = new ArrayList<>();
-        for(Room room: availableRooms){
+        for (Room room : availableRooms) {
             byte[] photoBytes = roomService.getRoomPhotoByRoomId(room.getId());
-            if(photoBytes != null && photoBytes.length > 0){
+            if (photoBytes != null && photoBytes.length > 0) {
                 String photoBase64 = Base64.encodeBase64String(photoBytes);
                 RoomResponse roomResponse = getRoomResponse(room);
-                roomResponse.setPhoto(photoBase64) ;
+                roomResponse.setPhoto(photoBase64);
                 roomResponses.add(roomResponse);
             }
         }
-        if(roomResponses.isEmpty())
-        {
+        if (roomResponses.isEmpty()) {
             return ResponseEntity.noContent().build();
 
-        }else{
+        } else {
             return ResponseEntity.ok(roomResponses);
         }
     }
@@ -146,15 +143,15 @@ public class RoomController {
         List<BookedRoom> bookings = getAllBookingsByRoomId(room.getId());
         byte[] photoBytes = null;
         Blob photoBlob = room.getPhoto();
-        if(photoBlob != null){
-            try{
-                photoBytes = photoBlob.getBytes(1,(int)photoBlob.length());
-            }catch (SQLException e){
+        if (photoBlob != null) {
+            try {
+                photoBytes = photoBlob.getBytes(1, (int) photoBlob.length());
+            } catch (SQLException e) {
                 throw new PhotoRetrievalException("Error retrieving photo");
 
             }
         }
-        return new RoomResponse(room.getId(),room.getRoomType(),room.getRoomPrice(),room.isBooked(),photoBytes);
+        return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(), room.isBooked(), photoBytes);
     }
 
     private List<BookedRoom> getAllBookingsByRoomId(Long roomId) {
@@ -164,20 +161,20 @@ public class RoomController {
 
     //tìm kiếm phòng khach sạn cua user
     @PostMapping("/research")
-    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> searchListRoom(@RequestParam("city") String city,
-                                                                          @RequestParam("checkInDate")LocalDateTime checkInDate,
-                                                                          @RequestParam("totalNights") Integer totalNights,
-                                                                          @RequestParam("adults") Integer adults,
-                                                                          @RequestParam("children") Integer children){
-
-            List<DetailCityResponse> lstRoom = roomService.searchListRoom(city, checkInDate, totalNights, adults, children);
-            ApiResponse<List<DetailCityResponse>> apiResponse = ApiResponse.<List<DetailCityResponse>> builder()
-                    .status("200")
-                    .code(HttpStatus.OK.value())
-                    .message("Search List Room Successfully!")
-                    .data(lstRoom)
-                    .build();
-            return ResponseEntity.ok(apiResponse);
+    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> searchListRoom(
+            @RequestParam("city") String city,
+            @RequestParam("checkInDate") LocalDateTime checkInDate,
+            @RequestParam("totalNights") Integer totalNights,
+            @RequestParam("adults") Integer adults,
+            @RequestParam("children") Integer children) {
+        List<DetailCityResponse> lstRoom = roomService.searchListRoom(city, checkInDate, totalNights, adults, children);
+        ApiResponse<List<DetailCityResponse>> apiResponse = ApiResponse.<List<DetailCityResponse>>builder()
+                .status("200")
+                .code(HttpStatus.OK.value())
+                .message("Search List Room Successfully!")
+                .data(lstRoom)
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
 }

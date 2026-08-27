@@ -45,4 +45,7 @@ public class Promotions {
 
     @OneToMany(mappedBy = "promotions", cascade = CascadeType.ALL)
     private List<Vouchers> vouchers;
+
+    @Column(name = "voucher_limited_quantity")
+    private Long voucherLimitedQuantity;
 }

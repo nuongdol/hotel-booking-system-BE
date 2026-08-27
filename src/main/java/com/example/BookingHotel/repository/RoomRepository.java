@@ -3,20 +3,15 @@ package com.example.BookingHotel.repository;
 import com.example.BookingHotel.model.Room;
 import com.example.BookingHotel.response.DetailCityResponse;
 import com.example.BookingHotel.sql.SQLRoom;
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @EnableJpaRepositories
 @Repository
@@ -35,7 +30,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query(nativeQuery = true, value = SQLRoom.SEARCH_LIST_ROOM)
     List<DetailCityResponse> searchListRoom(@Param("city") String city,
                                             @Param("checkInDate") LocalDateTime checkInDate,
-                                            @Param("totalNights") Integer totalNights,
+                                            @Param("checkOutDate") LocalDateTime checkOutDate,
                                             @Param("adults") Integer adults,
                                             @Param("children") Integer children);
 }
