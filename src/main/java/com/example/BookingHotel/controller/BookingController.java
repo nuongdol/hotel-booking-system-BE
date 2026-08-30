@@ -4,6 +4,7 @@ package com.example.BookingHotel.controller;
 import com.example.BookingHotel.exception.InvalidBookingRequestException;
 import com.example.BookingHotel.model.BookedRoom;
 import com.example.BookingHotel.model.Room;
+import com.example.BookingHotel.request.BookedRoomRequest;
 import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.BookingResponse;
 import com.example.BookingHotel.response.InformationBookingRoom;
@@ -58,7 +59,7 @@ public class BookingController {
     //luu thong tin dat phong
     @PostMapping("/{roomId}")
     public ResponseEntity<?> saveBooking(@PathVariable("roomId") Long roomId,
-                                         @RequestBody BookedRoom bookingRequest,
+                                         @RequestBody BookedRoomRequest bookingRequest,
                                          HttpServletRequest httpServletRequest) {
         String ipAddress = RequestUtil.getIpAddress(httpServletRequest);
         bookingRequest.setIpAddress(ipAddress);

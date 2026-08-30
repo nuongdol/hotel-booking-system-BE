@@ -1,5 +1,6 @@
 package com.example.BookingHotel.model;
 
+import com.example.BookingHotel.request.BookedRoomRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 import java.sql.Blob;
@@ -66,11 +68,13 @@ public class Room {
         //khoi tao danh sach dat phong
     }
 
-    public void addBooking(BookedRoom booking) {
+    public void addBooking(BookedRoomRequest booking) {
         if (bookings == null) {
             bookings = new ArrayList<>();
         }
-        bookings.add(booking);//arrayList có hàm add
+        BookedRoom newBooking = new BookedRoom();
+        BeanUtils.copyProperties(booking, newBooking);
+        bookings.add(newBooking);//arrayList có hàm add
         booking.setRoom(this);//this o day la ban than classroom
         isBooked = true;
         String bookingCode = RandomStringUtils.randomNumeric(10);//bookingCode --> guests booked room

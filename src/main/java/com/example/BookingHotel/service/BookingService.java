@@ -9,9 +9,11 @@ import com.example.BookingHotel.model.RoomInventory;
 import com.example.BookingHotel.model.User;
 import com.example.BookingHotel.repository.BookingRepository;
 import com.example.BookingHotel.repository.RoomInventoryRepository;
+import com.example.BookingHotel.request.BookedRoomRequest;
 import com.example.BookingHotel.request.InitPaymentRequest;
 import com.example.BookingHotel.response.BookingResponse;
 import com.example.BookingHotel.response.InformationBookingRoom;
+import com.example.BookingHotel.response.RoomInventoryResponse;
 import com.example.BookingHotel.util.AuthUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -114,13 +114,13 @@ public class BookingService implements IBookingService {
     public InformationBookingRoom getInformationBookingRoom(Long roomId, String city, LocalDateTime checkInDate,
                                                             Integer totalNights, Integer adults, Integer children) {
         User bookingUser = AuthUtils.getCurrentUser();
-        if(bookingUser == null){
+        if (bookingUser == null) {
             throw new BusinessException(ResponseCode.USER_NOT_FOUND);
         }
         LocalDateTime checkOutDate = checkInDate.plusDays(totalNights);
         InformationBookingRoom response = bookingRepository.getInformationBookingRoom(roomId, bookingUser.getId(), city,
                 checkInDate, checkOutDate, adults, children);
-        if(response == null){
+        if (response == null) {
             throw new BusinessException(ResponseCode.INFORMATION_BOOKING_IS_NULL);
         }
         return response;
@@ -163,8 +163,9 @@ public class BookingService implements IBookingService {
                 }
                 //giu cho thanh cong
                 return true;
+            } else {
+                return false;
             }
-            return false;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new BusinessException(ResponseCode.ERROR_SYSTEM);
@@ -197,12 +198,12 @@ public class BookingService implements IBookingService {
     }
 
     @Override
-    public String saveBooking(Long roomId, BookedRoom bookingRequest) {
+    public String saveBooking(Long roomId, BookedRoomRequest bookingRequest) {
         LocalDate checkinDate = bookingRequest.getCheckInDate();
         LocalDate checkoutDate = bookingRequest.getCheckOutDate();
         validateRequest(bookingRequest);
         /* check available room from check-indate to check-outdate */
-        RoomInventory roomInventory = roomInventoryRepository.findByAvailabilityRoom(roomId, checkinDate, checkoutDate);
+        RoomInventoryResponse roomInventory = roomInventoryRepository.findByAvailabilityRoom(roomId, checkinDate, checkoutDate);
         if (roomInventory.getStock() <= 0) {
             throw new BusinessException(ResponseCode.ROOM_EMPTY_INVALID);
         }
@@ -210,11 +211,11 @@ public class BookingService implements IBookingService {
         //tạo một mã code cho giữ chỗ cho khach hang
         String bookingCode = UUID.randomUUID().toString();
         boolean holdRoomSuccess = holdRoom(roomId, bookingRequest.getCheckInDate(),
-                bookingRequest.getCheckOutDate(), bookingCode, roomInventory.getQuantityOfBookedRoom());
+                bookingRequest.getCheckOutDate(), bookingCode, roomInventory.getBookedRoom());
         if (!holdRoomSuccess) {
             throw new BusinessException(ResponseCode.BOOKED_ROOM_INVALID);
         }
-        /* payment */
+        /* payment: tính số tiền cần phải trả của user*/
         BigDecimal totalPrice = priceService.calculate(roomId, checkinDate, checkoutDate);
         bookingRequest.setFinalPrice(totalPrice);
         /* Optimistic lock + saveBooking in DB */
@@ -226,10 +227,12 @@ public class BookingService implements IBookingService {
         return bookingRequest.getBookingConfirmationCode();
     }
 
-    private void validateRequest(BookedRoom bookingRequest) {
+    private void validateRequest(BookedRoomRequest bookingRequest) {
         /* check-indate > check-outdate*/
         LocalDate checkinDate = bookingRequest.getCheckInDate();
         LocalDate checkoutDate = bookingRequest.getCheckOutDate();
+        bookingRequest.setTotalNumOfGuest(bookingRequest.calculationTotalNumOfGuest(bookingRequest.getNumOfAdults(),
+                bookingRequest.getNumOfChildren()));
         LocalDate currentDate = LocalDate.now();
         if (checkinDate.isAfter(checkoutDate)) {
             throw new BusinessException(ResponseCode.CHECKIN_DATE_INVALID);
@@ -244,21 +247,25 @@ public class BookingService implements IBookingService {
 
     @Transactional
     public boolean completeBookingPayment(Long roomId, List<LocalDate> lstStayedDay,
-                                          String bookingCode, BookedRoom bookingRequest) {
+                                          String bookingCode, BookedRoomRequest bookingRequest) {
+        BookedRoom bookingSave = new BookedRoom();
         try {
-
             Room room = roomService.getRoomById(roomId).get();
             int updateRows = 0;
             for (LocalDate date : lstStayedDay) {
                 updateRows = roomInventoryService.processBookingRoom(roomId, date);
                 //optimistic locking
-                if (updateRows == 1) {//version trong database
-                    room.addBooking(bookingRequest);
-                    bookingRepository.save(bookingRequest);
-                } else {
+                if(updateRows != 1){
                     throw new BusinessException(ResponseCode.CONFLICTED_ROOM);
                 }
             }
+            //tạo duy nhất 1 booking room
+            bookingRequest.setBookingConfirmationCode(bookingCode);
+            BeanUtils.copyProperties(bookingRequest, bookingSave);
+            bookingSave.setRoom(room);
+            //luu vào trong DB
+            BookedRoom booking = bookingRepository.save(bookingSave);
+            bookingRequest.setBookingId(booking.getBookingId());
             finishedPayment(bookingRequest);
             return true;
         } catch (Exception e) {
@@ -267,7 +274,7 @@ public class BookingService implements IBookingService {
         }
     }
 
-    private void finishedPayment(BookedRoom bookingRequest) {
+    private void finishedPayment(BookedRoomRequest bookingRequest) {
         var initPaymentRequest = InitPaymentRequest.builder()
                 .customerId(bookingRequest.getCustomerId())
                 .amount(bookingRequest.getFinalPrice().longValue())

@@ -1,6 +1,7 @@
 package com.example.BookingHotel.repository;
 
 import com.example.BookingHotel.model.RoomInventory;
+import com.example.BookingHotel.response.RoomInventoryResponse;
 import com.example.BookingHotel.sql.SQLInventory;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Repository
 public interface RoomInventoryRepository extends JpaRepository<RoomInventory, Long> {
@@ -24,7 +26,7 @@ public interface RoomInventoryRepository extends JpaRepository<RoomInventory, Lo
                       @Param("date") LocalDate date);
 
     @Query(nativeQuery = true, value = SQLInventory.AVAILABLE_ROOM_CHECK)
-    RoomInventory findByAvailabilityRoom(@Param("roomId") Long roomId,
-                                         @Param("checkinDate") LocalDate checkinDate,
-                                         @Param("checkoutDate") LocalDate checkoutDate);
+    RoomInventoryResponse findByAvailabilityRoom(@Param("roomId") Long roomId,
+                                                      @Param("checkinDate") LocalDate checkinDate,
+                                                      @Param("checkoutDate") LocalDate checkoutDate);
 }

@@ -1,6 +1,7 @@
 package com.example.BookingHotel.service;
 
 import com.example.BookingHotel.model.BookedRoom;
+import com.example.BookingHotel.request.BookedRoomRequest;
 import com.example.BookingHotel.response.BookingResponse;
 import com.example.BookingHotel.response.InformationBookingRoom;
 
@@ -9,7 +10,7 @@ import java.util.List;
 public interface IBookingService {
     BookedRoom findByBookingConfirmationCode(String confirmationCode);
 
-    String saveBooking(Long roomId, BookedRoom bookingRequest);
+    String saveBooking(Long roomId, BookedRoomRequest bookingRequest);
 
     void cancelBooking(Long bookingId);
 

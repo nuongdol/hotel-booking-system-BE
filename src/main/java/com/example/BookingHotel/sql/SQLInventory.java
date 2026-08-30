@@ -3,14 +3,16 @@ package com.example.BookingHotel.sql;
 public class SQLInventory {
 
     public static final String  AVAILABLE_ROOM_CHECK =
-            "select i.room_inventory_id as roomInventoryId,\n" +
-                    "\t   i.available_room_date as availableRoomDate,\n" +
-                    "       i.booked_room as bookedRoom,\n" +
-                    "       i.last_updated as lastUpdated,\n" +
-                    "       i.price_multiplier as priceMultiplier,\n" +
-                    "       i.stock as stock,\n" +
-                    "       i.version as version,\n" +
-                    "       i.room_id as roomId\n" +
-                    "       from room_inventory as i\n" +
-                    "       where i.room_id = :roomId and i.available_room_date >=:checkinDate and  i.available_room_date <=:checkoutDate";
+            "select ri.room_inventory_id as roomInventoryId,\n" +
+                    "       ri.booked_room as bookedRoom,\n" +
+                    "       ri.last_updated as lastUpdated,\n" +
+                    "       ri.price_multiplier as priceMultiplier,\n" +
+                    "       ri.stock as stock,\n" +
+                    "       ri.version as version,\n" +
+                    "       ri.room_id as roomId\n" +
+                    "       from room_inventory as ri\n" +
+                    "       where ri.room_id = :roomId " +
+                    "and ri.available_room_date >=:checkinDate " +
+                    "and  ri.available_room_date <=:checkoutDate " +
+                    "limit 1 ";
 }

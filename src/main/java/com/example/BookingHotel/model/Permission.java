@@ -2,7 +2,9 @@ package com.example.BookingHotel.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,6 +13,8 @@ import java.util.HashSet;
 @Table(name = "permission")
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
+@Getter
 public class Permission {
 
     @Id

@@ -47,4 +47,6 @@ public class RoomInventory {
     @ManyToOne(fetch = FetchType.LAZY) //N dòng trong inventory thuộc về 1 dòng
     @JoinColumn(name = "room_id")
     private Room room;
+
+
 }
