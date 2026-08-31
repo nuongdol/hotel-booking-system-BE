@@ -9,7 +9,10 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,7 +38,7 @@ public class City {
     @Column(name = "description")
     private String description;
 
-    @Column(name= "province")
+    @Column(name = "province")
     private String province;
 
     @Column(name = "created_at")
@@ -43,4 +46,10 @@ public class City {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "city_tag",
+            joinColumns = @JoinColumn(name = "city_id", referencedColumnName = "city_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "tag_id"))
+    private Collection<Tag> tags = new HashSet<>();
 }

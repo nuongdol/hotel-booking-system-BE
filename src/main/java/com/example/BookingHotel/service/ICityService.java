@@ -10,4 +10,6 @@ public interface ICityService {
     List<CityResponse> getCity();
 
     List<DetailCityResponse> getDetailCheapestCity(Long cityId);
+
+    List<DetailCityResponse> getDetailPopularCity(Long cityId);
 }

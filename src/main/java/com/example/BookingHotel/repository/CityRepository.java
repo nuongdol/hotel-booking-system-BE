@@ -24,4 +24,7 @@ public interface CityRepository extends JpaRepository<City, Long> {
 
     @Query(nativeQuery = true, value = SQLHotel.GET_CHEAPEST_ROOM_IN_CITY)
     List<DetailCityResponse> getDetailCheapestCity(Long cityId);
+
+    @Query(nativeQuery = true, value = SQLHotel.GET_CHEAPEST_ROOM_IN_CITY)
+    List<DetailCityResponse> getDetailPopularCity(Long cityId);
 }

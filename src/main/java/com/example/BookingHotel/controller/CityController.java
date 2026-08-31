@@ -39,7 +39,7 @@ public class CityController {
 
     @GetMapping("/{cityId}/rooms/cheapest")
     @Operation(description = "lay phong co gia re nhat cua moi khach san trong thanh pho")
-    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> getDetailCheapestCity(@PathVariable("cityId") Long cityId){
+    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> getDetailCheapestCity(@PathVariable("cityId") Long cityId) {
         List<DetailCityResponse> responses = cityService.getDetailCheapestCity(cityId);
         ApiResponse<List<DetailCityResponse>> apiResponse = ApiResponse.<List<DetailCityResponse>>builder()
                 .status("SUCCESS")
@@ -47,12 +47,20 @@ public class CityController {
                 .data(responses)
                 .message("Get list detail cheapest city successfully!")
                 .build();
-            return ResponseEntity.ok(apiResponse);
+        return ResponseEntity.ok(apiResponse);
     }
 
     @GetMapping("/{cityId}/rooms/popular")
     @Operation(description = "lay phong dung pho bien nhat cua moi khach san trong thanh pho")
-    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> getDetailPopularCity(){
-        return null;
+    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> getDetailPopularCity(@PathVariable("cityId")
+                                                                                      Long cityId) {
+        List<DetailCityResponse> responses = cityService.getDetailPopularCity(cityId);
+        ApiResponse<List<DetailCityResponse>> apiResponse = ApiResponse.<List<DetailCityResponse>>builder()
+                .status("SUCCESS")
+                .data(responses)
+                .message("Get list detail popular city successfully!")
+                .code(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 }

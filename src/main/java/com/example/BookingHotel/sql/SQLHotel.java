@@ -82,4 +82,5 @@ public class SQLHotel {
             "LEFT JOIN policies AS p ON p.room_rate_plans_id = cr.rate_plan_id\n" +
             "LEFT JOIN promotions AS promo ON promo.room_rate_plan_id = cr.rate_plan_id\n" +
             "WHERE c.city_id = :cityId";
+    public static final String GET_POPULAR_ROOM_IN_CITY = "";
 }
