@@ -38,8 +38,8 @@ public class SQLRoom {
                     "LEFT JOIN policies AS p ON p.room_rate_plans_id = rrp.rate_plan_id\n" +
                     "LEFT JOIN promotions AS promo ON promo.room_rate_plan_id = rrp.rate_plan_id\n" +
                     "LEFT JOIN vouchers AS v ON v.promotion_id = promo.promo_id\n" +
-                    "WHERE c.name = :city and r.max_adults >= :adults and r.max_children = :children and r.room_id = :roomId\n" +
-                    "and r.id not in (\n" +
+                    "WHERE c.name = :city or r.max_adults >= :adults or r.max_children = :children or r.room_id = :roomId\n" +
+                    "or r.id not in (\n" +
                     "select br.room_id from booked_room as br\n" +
                     "where br.status = 'CONFIRMED'\n" +
                     "    and br.check_out_date > :checkInDate\n" +

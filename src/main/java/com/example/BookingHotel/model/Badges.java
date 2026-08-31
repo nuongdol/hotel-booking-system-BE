@@ -37,4 +37,11 @@ public class Badges {
             joinColumns = @JoinColumn(name = "badge_id", referencedColumnName = "badge_id"),
             inverseJoinColumns = @JoinColumn(name = "voucher_id", referencedColumnName = "voucher_id"))
     Collection<Vouchers> vouchers = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+    @JoinTable(name = "badges_categories",
+            joinColumns = @JoinColumn(name = "badge_id", referencedColumnName = "badge_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "category_id"))
+    Collection<Categories> categories = new HashSet<>();
+
 }

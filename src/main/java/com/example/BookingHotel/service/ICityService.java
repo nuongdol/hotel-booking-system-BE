@@ -11,5 +11,5 @@ public interface ICityService {
 
     List<DetailCityResponse> getDetailCheapestCity(Long cityId);
 
-    List<DetailCityResponse> getDetailPopularCity(Long cityId);
+    List<DetailCityResponse> getDetailPopularCity();
 }

@@ -50,11 +50,10 @@ public class CityController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @GetMapping("/{cityId}/rooms/popular")
+    @GetMapping("/rooms/popular")
     @Operation(description = "lay phong dung pho bien nhat cua moi khach san trong thanh pho")
-    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> getDetailPopularCity(@PathVariable("cityId")
-                                                                                      Long cityId) {
-        List<DetailCityResponse> responses = cityService.getDetailPopularCity(cityId);
+    public ResponseEntity<ApiResponse<List<DetailCityResponse>>> getDetailPopularCity() {
+        List<DetailCityResponse> responses = cityService.getDetailPopularCity();
         ApiResponse<List<DetailCityResponse>> apiResponse = ApiResponse.<List<DetailCityResponse>>builder()
                 .status("SUCCESS")
                 .data(responses)

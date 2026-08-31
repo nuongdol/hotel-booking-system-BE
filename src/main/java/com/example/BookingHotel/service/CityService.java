@@ -52,8 +52,8 @@ public class CityService implements ICityService{
     }
 
     @Override
-    public List<DetailCityResponse> getDetailPopularCity(Long cityId) {
-        List<DetailCityResponse> responses = cityRepository.getDetailPopularCity(cityId);
+    public List<DetailCityResponse> getDetailPopularCity() {
+        List<DetailCityResponse> responses = cityRepository.getDetailPopularCity();
         if(responses == null || responses.isEmpty()){
             throw new BusinessException(ResponseCode.POPULAR_ROOM_NOT_FOUND);
         }

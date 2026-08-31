@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,4 +69,7 @@ public class Vouchers {
 
     @Column(name = "ended_at")
     private LocalDateTime endedAt;
+
+    @ManyToMany(mappedBy = "vouchers", cascade = CascadeType.ALL)
+    private Collection<Badges> badges;
 }

@@ -160,7 +160,7 @@ public class RoomController {
     }
 
     //tìm kiếm phòng khach sạn cua user
-    @PostMapping("/research")
+    @GetMapping("/research")
     public ResponseEntity<ApiResponse<List<DetailCityResponse>>> searchListRoom(
             @RequestParam("city") String city,
             @RequestParam("checkInDate") LocalDateTime checkInDate,
@@ -176,5 +176,4 @@ public class RoomController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
-
 }
