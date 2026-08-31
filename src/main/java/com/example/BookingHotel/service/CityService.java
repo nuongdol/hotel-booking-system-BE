@@ -33,6 +33,7 @@ public class CityService implements ICityService{
             response.setHotelsCount(city.getHotelsCount());
             response.setImageUrl(city.getImageUrl());
             response.setMinPrice(city.getMinPrice());
+            response.setTagName(city.getTagName());
             return response;
         }).toList();
         if(lstCityResponse == null || lstCityResponse.isEmpty()){

@@ -9,6 +9,7 @@ import java.util.HashSet;
 @Entity
 @NoArgsConstructor
 @Table(name = "badges")
+//nhan phu cho hotel
 public class Badges {
 
     @Id
@@ -30,4 +31,10 @@ public class Badges {
             joinColumns = @JoinColumn(name = "badge_id", referencedColumnName = "badge_id"),
             inverseJoinColumns = @JoinColumn(name = "hotel_id", referencedColumnName = "hotel_id"))
     Collection<Hotel> hotels = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+    @JoinTable(name = "badges_voucher",
+            joinColumns = @JoinColumn(name = "badge_id", referencedColumnName = "badge_id"),
+            inverseJoinColumns = @JoinColumn(name = "voucher_id", referencedColumnName = "voucher_id"))
+    Collection<Vouchers> vouchers = new HashSet<>();
 }

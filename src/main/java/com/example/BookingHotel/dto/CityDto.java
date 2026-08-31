@@ -8,4 +8,5 @@ public interface CityDto {
      Long getHotelsCount();
      BigDecimal getMinPrice();
      String getImageUrl();
+     String getTagName();
 }

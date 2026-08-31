@@ -28,11 +28,14 @@ public class SQLHotel {
             "select c.city_id as cityId,\n" +
                     "c.name as name,\n" +
                     "c.image_url as imageUrl,\n" +
+                    "GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',') as tagName,\n" +
                     "MIN(r.room_price) as minPrice,\n" +
                     "COUNT( DISTINCT h.hotel_id) as hotelsCount\n" +
                     "FROM city as c\n" +
                     "LEFT JOIN hotel as h on h.id_city = c.city_id\n" +
                     "LEFT JOIN room as r on r.hotel_id = h.hotel_id\n" +
+                    "LEFT JOIN city_tag as ct on ct.city_id = c.city_id\n" +
+                    "LEFT JOIN tag as t on t.tag_id = ct.tag_id\n" +
                     "WHERE c.city_id in :cityIds\n" +
                     "GROUP BY c.city_id, c.name";
 

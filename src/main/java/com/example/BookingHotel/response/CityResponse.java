@@ -18,4 +18,5 @@ public class CityResponse {
     // phong re nhat trong các khách sạn thuộc thành pho du lich
     private BigDecimal minPrice;
     private String imageUrl;
+    private String tagName;
 }

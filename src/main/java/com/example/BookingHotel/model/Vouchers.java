@@ -2,9 +2,12 @@ package com.example.BookingHotel.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,6 +15,8 @@ import java.util.Set;
 @Table(name = "vouchers")
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
 public class Vouchers {
 
     @Id
@@ -24,6 +29,9 @@ public class Vouchers {
 
     @Column(name = "discount_amount")
     private BigDecimal discountAmount;
+
+    @Column(name = "description")
+    private String description;
 
     //1 promotion- n vouchers
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,4 +52,20 @@ public class Vouchers {
 
     @Column(name = "usage_limit")
     private Integer usageLimit;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    /*
+    1 = active
+    0 = non-active
+     */
+    @Column(name = "status")
+    private Integer status;
+
+    @Column(name = "ended_at")
+    private LocalDateTime endedAt;
 }
