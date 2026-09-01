@@ -1,5 +1,6 @@
 package com.example.BookingHotel.controller;
 
+import com.example.BookingHotel.dto.CityDto;
 import com.example.BookingHotel.response.ApiResponse;
 import com.example.BookingHotel.response.CityResponse;
 import com.example.BookingHotel.response.DetailCityResponse;

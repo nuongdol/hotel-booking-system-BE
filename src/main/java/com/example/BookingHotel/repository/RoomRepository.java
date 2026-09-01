@@ -32,5 +32,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                                             @Param("checkInDate") LocalDateTime checkInDate,
                                             @Param("checkOutDate") LocalDateTime checkOutDate,
                                             @Param("adults") Integer adults,
-                                            @Param("children") Integer children);
+                                            @Param("children") Integer children,
+                                            @Param("rooms") Integer rooms);
 }

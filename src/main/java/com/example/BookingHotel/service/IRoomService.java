@@ -30,6 +30,6 @@ public interface IRoomService {
 
     List<Room> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
 
-    List<DetailCityResponse> searchListRoom(String city, LocalDateTime checkInDate, Integer totalNights, Integer adults, Integer children);
+    List<DetailCityResponse> searchListRoom(String city, LocalDateTime checkInDate, Integer totalNights, Integer adults, Integer children, Integer rooms);
 }
 

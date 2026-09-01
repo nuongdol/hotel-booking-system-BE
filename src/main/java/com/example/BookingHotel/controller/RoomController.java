@@ -162,12 +162,16 @@ public class RoomController {
     //tìm kiếm phòng khach sạn cua user
     @GetMapping("/research")
     public ResponseEntity<ApiResponse<List<DetailCityResponse>>> searchListRoom(
-            @RequestParam("city") String city,
-            @RequestParam("checkInDate") LocalDateTime checkInDate,
-            @RequestParam("totalNights") Integer totalNights,
-            @RequestParam("adults") Integer adults,
-            @RequestParam("children") Integer children) {
-        List<DetailCityResponse> lstRoom = roomService.searchListRoom(city, checkInDate, totalNights, adults, children);
+            @RequestParam(value = "city", required = false, defaultValue = "Đà Nẵng") String city,
+            @RequestParam(value = "checkInDate", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate checkInDate,
+            @RequestParam(value = "totalNights", required = false, defaultValue = "1") Integer totalNights,
+            @RequestParam(value = "adults", required = false, defaultValue = "1") Integer adults,
+            @RequestParam(value = "children", required = false, defaultValue = "0") Integer children,
+            @RequestParam(value = "rooms", required = false, defaultValue = "1") Integer rooms) {
+
+        //chuyển đổi LocalDate thành LocalDateTime
+        LocalDateTime checkInDateTime = (checkInDate != null) ? checkInDate.atStartOfDay() : null;
+        List<DetailCityResponse> lstRoom = roomService.searchListRoom(city, checkInDateTime, totalNights, adults, children, rooms);
         ApiResponse<List<DetailCityResponse>> apiResponse = ApiResponse.<List<DetailCityResponse>>builder()
                 .status("200")
                 .code(HttpStatus.OK.value())
