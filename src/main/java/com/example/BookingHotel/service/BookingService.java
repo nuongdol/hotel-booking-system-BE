@@ -210,6 +210,7 @@ public class BookingService implements IBookingService {
         /* holding room for customer in 1 minute */
         //tạo một mã code cho giữ chỗ cho khach hang
         String bookingCode = UUID.randomUUID().toString();
+        //giữ phòng tạm thời bằng cách lưu trong redis
         boolean holdRoomSuccess = holdRoom(roomId, bookingRequest.getCheckInDate(),
                 bookingRequest.getCheckOutDate(), bookingCode, roomInventory.getBookedRoom());
         if (!holdRoomSuccess) {
@@ -218,6 +219,7 @@ public class BookingService implements IBookingService {
         /* payment: tính số tiền cần phải trả của user*/
         BigDecimal totalPrice = priceService.calculate(roomId, checkinDate, checkoutDate);
         bookingRequest.setFinalPrice(totalPrice);
+        bookingRequest.setBookingConfirmationCode(bookingCode);
         /* Optimistic lock + saveBooking in DB */
         List<LocalDate> lstStayedDay = getListDays(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
         boolean completeBookingRoom = completeBookingPayment(roomId, lstStayedDay, bookingCode, bookingRequest);
@@ -250,7 +252,12 @@ public class BookingService implements IBookingService {
                                           String bookingCode, BookedRoomRequest bookingRequest) {
         BookedRoom bookingSave = new BookedRoom();
         try {
-            Room room = roomService.getRoomById(roomId).get();
+            boolean completedPayment = finishedPayment(bookingRequest, bookingCode);
+//            boolean completedPayment = true;
+            if(!completedPayment){
+                throw new BusinessException(ResponseCode.COMPLETED_PAYMENT_FAIL);
+            }
+            Room room = roomService.getRoomById(roomId).orElseThrow(() -> new BusinessException(ResponseCode.ROOM_NOT_FOUND));
             int updateRows = 0;
             for (LocalDate date : lstStayedDay) {
                 updateRows = roomInventoryService.processBookingRoom(roomId, date);
@@ -260,13 +267,11 @@ public class BookingService implements IBookingService {
                 }
             }
             //tạo duy nhất 1 booking room
-            bookingRequest.setBookingConfirmationCode(bookingCode);
             BeanUtils.copyProperties(bookingRequest, bookingSave);
             bookingSave.setRoom(room);
             //luu vào trong DB
             BookedRoom booking = bookingRepository.save(bookingSave);
             bookingRequest.setBookingId(booking.getBookingId());
-            finishedPayment(bookingRequest);
             return true;
         } catch (Exception e) {
             System.err.println("Failed Transaction: " + e.getMessage());
@@ -274,14 +279,16 @@ public class BookingService implements IBookingService {
         }
     }
 
-    private void finishedPayment(BookedRoomRequest bookingRequest) {
+    private boolean finishedPayment(BookedRoomRequest bookingRequest, String bookingCode) {
         var initPaymentRequest = InitPaymentRequest.builder()
                 .customerId(bookingRequest.getCustomerId())
                 .amount(bookingRequest.getFinalPrice().longValue())
-                .txnRef(String.valueOf(bookingRequest.getBookingId()))
+//                .txnRef(String.valueOf(bookingRequest.getBookingId()))
+                .txnRef(bookingCode)
                 .ipAddress(bookingRequest.getIpAddress())
                 .build();
         var initPaymentResponse = paymentService.init(initPaymentRequest);
+        return initPaymentResponse.getPaymentStatus().equals("COMPLETED");
     }
 
     @Override

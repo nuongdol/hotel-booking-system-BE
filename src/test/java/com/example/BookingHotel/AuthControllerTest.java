@@ -24,7 +24,6 @@ import java.util.HashSet;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -83,7 +82,6 @@ public class AuthControllerTest {
     void registerUser_ReturnSuccess() throws Exception {
         when(userService.registerUser(any(UserRequest.class))).thenReturn(userResponse);
         mockMvc.perform(post("/api/v1/auth/register-user")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRequest)))
                 .andDo(print())
@@ -102,7 +100,6 @@ public class AuthControllerTest {
     void registerUser_InvalidEmail_ReturnBadRequest() throws Exception {
         userRequest.setEmail("email");
         mockMvc.perform(post("/api/v1/auth/register-user")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRequest)))
                 .andExpect(status().isBadRequest());
