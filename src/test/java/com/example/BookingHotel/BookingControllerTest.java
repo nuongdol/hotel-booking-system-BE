@@ -10,10 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SpringBootTest
@@ -46,10 +50,8 @@ public class BookingControllerTest {
                 try {
                     // Cả 10 thread sẽ nghẽn lại ở đây cho tới khi latch.countDown() được gọi
                     latch.await();
-
                     BookedRoomRequest request = createMockRequest(customerId);
                     bookingService.saveBooking(roomId, request);
-
                     successCount.incrementAndGet();
                 } catch (BusinessException e) {
                     failCount.incrementAndGet();
@@ -61,9 +63,24 @@ public class BookingControllerTest {
                 }
             });
         }
-    }
+        latch.countDown();
+        doneLatch.await(10, TimeUnit.SECONDS);
+        executorService.shutdown();
 
+        System.out.println("Thành công: " + successCount.get());
+        System.out.println("Thất bại: " + failCount.get());
+
+        assertEquals(1, successCount.get());
+        assertEquals(9, failCount.get());
+    }
     private BookedRoomRequest createMockRequest(long customerId) {
+        BookedRoomRequest request = new BookedRoomRequest();
+        request.setCheckInDate(LocalDate.now().plusDays(1));
+        request.setCheckOutDate(LocalDate.now().plusDays(2));
+        request.setNumOfAdults(1);
+        request.setCustomerId(customerId);
+        request.setNumOfChildren(2);
+        return request;
     }
 }
 

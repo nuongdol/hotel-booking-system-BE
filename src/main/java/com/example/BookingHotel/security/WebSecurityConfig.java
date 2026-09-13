@@ -57,8 +57,9 @@ public class WebSecurityConfig {
                         exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/register-user", "/api/v1/rooms/**", "/api/v1/booking/**"
-                                , "/api/v1/role/**", "/api/v1/hotels/**", "/api/v1/auth/login", "/api/v1/voucher/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/rooms/**", "/api/v1/booking/**"
+                                , "/api/v1/role/**", "/api/v1/hotels/**", "/api/v1/auth/login", "/api/v1/voucher/**",
+                                "/api/v1/password/{otp}/{email}/{preAuthenticationToken}").permitAll()
                         .requestMatchers("/role/**").hasRole("ADMIN")
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/city/**").permitAll()

@@ -25,11 +25,11 @@ public class JwtResponse {
 
     private List<String> roles;
 
-    public JwtResponse(Long id, String email, String accessToken,
-                       List<String> roles) {
-        this.id = id;
-        this.email = email;
-        this.accessToken = accessToken;
-        this.roles = roles;
-    }
+    private UserResponse userResponse;
+
+    private String statusOTP = "REQUIRE_OTP";
+
+    private String preAuthenticationToken;
+
+    private Boolean statusOtp;
 }

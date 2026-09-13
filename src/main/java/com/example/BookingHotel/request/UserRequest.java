@@ -1,6 +1,6 @@
 package com.example.BookingHotel.request;
 
-import com.example.BookingHotel.model.Role;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
-import java.util.HashSet;
 
 @Data
 @AllArgsConstructor
@@ -33,6 +31,4 @@ public class UserRequest {
     private String phone;
 
     private String address;
-
-    private Collection<Role> roles = new HashSet<>();
 }

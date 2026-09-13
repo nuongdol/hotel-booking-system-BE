@@ -30,11 +30,13 @@ spring:
     port: 587
     username: ${USER_NAME_EMAIL}
     password: ${PASSWORD_EMAIL}
-    mail:
+    properties:
+      mail:
         smtp:
           auth: true
           starttls:
             enable: true
+            required: true
 
 #mybatis-plus:
 #  configuration:

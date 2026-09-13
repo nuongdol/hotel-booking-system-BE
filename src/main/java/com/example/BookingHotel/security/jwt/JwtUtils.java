@@ -1,5 +1,6 @@
 package com.example.BookingHotel.security.jwt;
 
+import com.example.BookingHotel.model.User;
 import com.example.BookingHotel.security.User.HotelUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

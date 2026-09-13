@@ -2,9 +2,11 @@ package com.example.BookingHotel.controller;
 
 import com.example.BookingHotel.request.ResetPasswordRequest;
 import com.example.BookingHotel.response.ApiResponse;
+import com.example.BookingHotel.response.JwtResponse;
 import com.example.BookingHotel.response.ResetPasswordResponse;
 import com.example.BookingHotel.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
@@ -33,19 +35,22 @@ public class ForgotPasswordController {
                 .message("Successful verify email!")
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
     }
 
     //verify OTP
-    @PostMapping("/{opt}/{email}")
+    @PostMapping("/{otp}/{email}/{preAuthenticationToken}")
     @Operation(description = "verify Otp")
-    public ResponseEntity<ApiResponse<String>> verifyOtp(@PathVariable String otp,
-                                                         @PathVariable @Email(message = "Email khong dung dinh dang") String email) {
-        boolean validOtp = userService.verifyOtp(otp, email);
+    public ResponseEntity<ApiResponse<JwtResponse>> verifyOtp(@PathVariable String otp,
+                                                              @PathVariable @Email(message = "Email khong dung dinh dang") String email,
+                                                              @PathVariable String preAuthenticationToken,
+                                                              HttpServletResponse httpResponse
+    ) {
+        JwtResponse jwtResponse = userService.verifyOtp(otp, email, preAuthenticationToken, httpResponse);
+        boolean validOtp = Boolean.parseBoolean(jwtResponse.getStatusOTP());
 
-        ApiResponse<String> response = ApiResponse.<String>builder()
+        ApiResponse<JwtResponse> response = ApiResponse.<JwtResponse>builder()
                 .status("SUCCESS")
-                .data(validOtp ? "success valid otp" : "failed valid otp")
+                .data(validOtp ? jwtResponse : null)
                 .code(HttpStatus.CREATED.value())
                 .message("Successful verify email!")
                 .build();

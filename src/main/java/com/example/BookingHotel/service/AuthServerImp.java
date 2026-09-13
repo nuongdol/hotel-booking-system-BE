@@ -5,22 +5,30 @@ import com.example.BookingHotel.exception.BusinessException;
 import com.example.BookingHotel.model.User;
 import com.example.BookingHotel.repository.UserRepository;
 import com.example.BookingHotel.request.LoginRequest;
+import com.example.BookingHotel.request.MailBody;
 import com.example.BookingHotel.response.JwtResponse;
+import com.example.BookingHotel.response.UserResponse;
 import com.example.BookingHotel.security.User.HotelUserDetails;
 import com.example.BookingHotel.security.jwt.JwtUtils;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -32,6 +40,13 @@ public class AuthServerImp implements IAuthService {
     private final JwtUtils jwtUtils;
     private final RedisService redisService;
     private final UserRepository userRepository;
+    private static final String OTP_PREFIX = "otp:forgot:";
+    private static final String PRE_AUTHENTICATION_TOKEN_PREFIX = "preToken:";
+    private static final long EXPIRY_MINUTES = 10;
+
+    private final Executor emailExecutor;
+    private final IEmailService emailService;
+
 
     @Override
     public JwtResponse login(LoginRequest request, HttpServletResponse response) {
@@ -39,19 +54,37 @@ public class AuthServerImp implements IAuthService {
         Authentication authentication =
                 authenticationManager
                         .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        String accessToken = jwtUtils.generateJwtTokenForUser(authentication);
-        String refreshToken = jwtUtils.generateJwtRefreshTokenForUser(authentication);
-        //luu refreshToken vao cookie
-        Cookie refreshTokenCookie = getRefreshTokenCookie(refreshToken);
-        response.addCookie(refreshTokenCookie);
+        String preAuthenticationToken = UUID.randomUUID().toString();
+        String keyToken = PRE_AUTHENTICATION_TOKEN_PREFIX + request.getEmail();
+        redisService.setToken(keyToken, preAuthenticationToken, EXPIRY_MINUTES, TimeUnit.MINUTES);
+        //sinh mã OTP
+        String otp = otpGenerator();
+        //Lưu Otp vào trong redis
+        String otpLoginKey = OTP_PREFIX + request.getEmail();
+        redisService.setOtp(otpLoginKey, otp, EXPIRY_MINUTES, TimeUnit.MINUTES);
+        //OTP duoc gui qua email
+        emailExecutor.execute(() -> {
+            MailBody mailBody = MailBody.builder()
+                    .to(request.getEmail())
+                    .text("This  the OTP for your forgot password request: " + otp)
+                    .subject("OTP for forgot password request")
+                    .build();
+            try {
+                emailService.sendSimpleMessage(mailBody);
+            } catch (MessagingException e) {
+                throw new BusinessException(ResponseCode.SEND_EMAIL_FAILED);
+            }
+        });
         HotelUserDetails userDetails = (HotelUserDetails) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority).toList();
         return JwtResponse.builder()
-                .accessToken(accessToken)
-                .roles(roles)
+                .preAuthenticationToken(preAuthenticationToken)
                 .email(userDetails.getEmail()).build();
+    }
+
+    private String otpGenerator() {
+        SecureRandom secureRandom = new SecureRandom();
+        int otp = 1000000 + secureRandom.nextInt(900000);
+        return String.valueOf(otp);
     }
 
     @Override
@@ -105,10 +138,13 @@ public class AuthServerImp implements IAuthService {
                 String accessToken = jwtUtils.generateJwtTokenForUser(authentication);
                 String newRefreshToken = jwtUtils.generateJwtRefreshTokenForUser(authentication);
                 refreshTokenCookie = getRefreshTokenCookie(newRefreshToken);
+                UserResponse userResponse = new UserResponse();
+                BeanUtils.copyProperties(user, userResponse);
                 response.addCookie(refreshTokenCookie);
                 jwtResponse = JwtResponse.builder()
                         .email(email)
                         .accessToken(accessToken)
+                        .userResponse(userResponse)
                         .build();
             }
         }

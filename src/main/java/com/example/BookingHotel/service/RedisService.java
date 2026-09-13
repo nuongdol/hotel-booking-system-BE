@@ -16,6 +16,10 @@ public class RedisService {
         redisTemplate.opsForValue().set(token, value, ttl, unit);
     }
 
+    public String getToken(String preAuthKey){
+        return redisTemplate.opsForValue().get(preAuthKey);
+    }
+
     //kiem tra neu token ton tai trong database
     public boolean hasToken(String token){
         return redisTemplate.hasKey(token);
