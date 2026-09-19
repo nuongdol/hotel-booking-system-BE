@@ -20,7 +20,7 @@ public interface IUserService {
 
     void deleteUser(String email);
 
-    User getUser(String email);
+    UserResponse getUser(String email);
 
     Page<User> getUsers(Pageable pageable);
 

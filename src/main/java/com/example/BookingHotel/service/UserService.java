@@ -19,6 +19,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -106,17 +107,19 @@ public class UserService implements IUserService {
     @Transactional
     @Override
     public void deleteUser(String email) {
-        User theUser = getUser(email);
+        UserResponse theUser = getUser(email);
         if (theUser != null) {
             userRepository.deleteByEmail(email);
         }
-
     }
 
     @Override
-    public User getUser(String email) {
-        return userRepository.findByEmail(email)
+    public UserResponse getUser(String email) {
+        UserResponse userResponse = new UserResponse();
+        User informationUser =  userRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+        BeanUtils.copyProperties(informationUser, userResponse);
+        return userResponse;
     }
 
     @Override
@@ -185,11 +188,18 @@ public class UserService implements IUserService {
         List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority).toList();
+        Boolean status = false;
+        if(accessToken != null){
+            status = true;
+        }
+        UserResponse userResponse = new UserResponse();
+        BeanUtils.copyProperties(user, userResponse);
         return JwtResponse.builder()
                 .accessToken(accessToken)
                 .roles(roles)
                 .email(email)
-                .statusOtp(true)
+                .status(status)
+                .userResponse(userResponse)
                 .build();
     }
 

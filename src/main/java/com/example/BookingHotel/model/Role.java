@@ -33,7 +33,8 @@ public class Role {
     private Collection<User> users = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany(mappedBy = "roles",
+                fetch = FetchType.EAGER)
     private Collection<Permission> permissions = new HashSet<>();
 
     public Role(String name) {

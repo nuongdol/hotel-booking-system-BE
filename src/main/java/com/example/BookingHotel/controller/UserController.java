@@ -1,6 +1,8 @@
 package com.example.BookingHotel.controller;
 
 import com.example.BookingHotel.model.User;
+import com.example.BookingHotel.response.ApiResponse;
+import com.example.BookingHotel.response.UserResponse;
 import com.example.BookingHotel.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,16 +38,17 @@ public class UserController {
     }
 
     @GetMapping("/{email}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> getUserByEmail(@PathVariable("email") String email){
-        try{
-            User theUser = userService.getUser(email);
-            return ResponseEntity.ok(theUser);
-        }catch (UsernameNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching user");
-        }
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<UserResponse>> getUserByEmail(@PathVariable("email") String email){
+
+            UserResponse theUser = userService.getUser(email);
+            ApiResponse<UserResponse> response= ApiResponse.<UserResponse>builder()
+                    .status("SUCCESS")
+                    .data(theUser)
+                    .code(HttpStatus.CREATED.value())
+                    .message("Successful verify email!")
+                    .build();
+            return ResponseEntity.ok(response);
     }
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and #email == principal.username)")

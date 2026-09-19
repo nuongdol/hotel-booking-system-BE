@@ -1,10 +1,7 @@
 package com.example.BookingHotel.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -13,6 +10,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Setter
+@Getter
 public class JwtResponse {
 
     private Long id;
@@ -31,5 +30,5 @@ public class JwtResponse {
 
     private String preAuthenticationToken;
 
-    private Boolean statusOtp;
+    private Boolean status;
 }

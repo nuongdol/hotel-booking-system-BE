@@ -46,11 +46,11 @@ public class ForgotPasswordController {
                                                               HttpServletResponse httpResponse
     ) {
         JwtResponse jwtResponse = userService.verifyOtp(otp, email, preAuthenticationToken, httpResponse);
-        boolean validOtp = Boolean.parseBoolean(jwtResponse.getStatusOTP());
+        Boolean status = jwtResponse.getStatus();
 
         ApiResponse<JwtResponse> response = ApiResponse.<JwtResponse>builder()
                 .status("SUCCESS")
-                .data(validOtp ? jwtResponse : null)
+                .data(status ? jwtResponse : null)
                 .code(HttpStatus.CREATED.value())
                 .message("Successful verify email!")
                 .build();

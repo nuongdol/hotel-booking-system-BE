@@ -1,5 +1,6 @@
 package com.example.BookingHotel.response;
 
+import com.example.BookingHotel.model.MemberLevel;
 import com.example.BookingHotel.model.Role;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -28,6 +30,10 @@ public class UserResponse {
     private String phone;
 
     private String address;
+
+    private MemberLevel memberLevelId;
+
+    private LocalDateTime createdAt;
 
     private Collection<Role> roles = new HashSet<>();
 }
