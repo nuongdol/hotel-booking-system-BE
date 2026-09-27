@@ -86,5 +86,87 @@ public class SQLHotel {
             "LEFT JOIN promotions AS promo ON promo.room_rate_plan_id = cr.rate_plan_id\n" +
             "WHERE c.city_id = :cityId";
 
-    public static final String GET_POPULAR_ROOM_IN_A_CITY = "";
+    public static final String GET_HIGH_RATING_HOTELS_PAGE =
+            "WITH popular_room AS (\n" +
+                    "    SELECT\n" +
+                    "        r.hotel_id,\n" +
+                    "        r.id AS room_id,\n" +
+                    "        r.room_type,\n" +
+                    "        rrp.rate_plan_id,\n" +
+                    "        rrp.original_price,\n" +
+                    "        rrp.price,\n" +
+                    "        rrp.is_tax_included,\n" +
+                    "        COUNT(br.booking_id) as booking_count,\n" +
+                    "        ROW_NUMBER() OVER (\n" +
+                    "            PARTITION BY r.hotel_id\n" +
+                    "            ORDER BY COUNT(br.booking_id) DESC\n" +
+                    "        ) AS rn\n" +
+                    "    FROM room AS r\n" +
+                    "    JOIN room_rate_plans AS rrp ON rrp.room_id = r.id\n" +
+                    "    LEFT JOIN booked_room AS br ON br.room_id = r.id\n" +
+                    "    GROUP BY r.hotel_id, r.id, r.room_type, rrp.rate_plan_id, rrp.original_price,\n" +
+                    "    rrp.price, rrp.is_tax_included\n" +
+                    "),\n" +
+                    "hotel_reviews AS (\n" +
+                    "\tSELECT hotel_id,\n" +
+                    "    COUNT(review_id) AS total_reviews,\n" +
+                    "    AVG(rating) AS avg_rating\n" +
+                    "    FROM review\n" +
+                    "    GROUP BY hotel_id\n" +
+                    ")\n" +
+                    "SELECT\n" +
+                    "    c.city_id AS cityId,\n" +
+                    "    c.name AS cityName,\n" +
+                    "    h.hotel_id AS hotelId,\n" +
+                    "    h.name_hotel AS nameHotel,\n" +
+                    "    h.address_hotel AS addressHotel,\n" +
+                    "    h.image_hotel AS imageHotel,\n" +
+                    "    h.rate_hotel AS rateHotel,\n" +
+                    "    h.location AS location,\n" +
+                    "    h.ward AS ward,\n" +
+                    "    h.district AS district,\n" +
+                    "    h.latitude AS latitude,\n" +
+                    "    h.longitude AS longitude,\n" +
+                    "    b.label AS badgeLabel,\n" +
+                    "    pr.room_type AS roomType,\n" +
+                    "    pr.original_price AS originalPrice,\n" +
+                    "    pr.price AS price,\n" +
+                    "    pr.is_tax_included AS isTaxIncluded,\n" +
+                    "    p.type AS policyType,\n" +
+                    "    p.description AS policyDescription,\n" +
+                    "    promo.label AS promoLabel,\n" +
+                    "    promo.discount_value AS discountValue,\n" +
+                    "    COALESCE(hr.total_reviews, 0) AS totalReviews,\n" +
+                    "    COALESCE(hr.avg_rating, 0) AS avgRating,\n" +
+                    "    be.benefit_id AS benefitId,\n" +
+                    "    be.name_benefit AS nameBenefit,\n" +
+                    "    be.icon AS icon\n" +
+                    "FROM city AS c\n" +
+                    "JOIN hotel AS h ON h.id_city = c.city_id\n" +
+                    "JOIN popular_room AS pr ON pr.hotel_id = h.hotel_id AND pr.rn = 1\n" +
+                    "LEFT JOIN badges_hotel AS bh ON bh.hotel_id = h.hotel_id\n" +
+                    "LEFT JOIN badges AS b ON b.badge_id = bh.badge_id\n" +
+                    "LEFT JOIN policies AS p ON p.room_rate_plans_id = pr.rate_plan_id\n" +
+                    "LEFT JOIN promotions AS promo ON promo.room_rate_plan_id = pr.rate_plan_id\n" +
+                    "LEFT JOIN hotel_reviews AS hr ON hr.hotel_id = h.hotel_id\n" +
+                    "LEFT JOIN benefits_room_rate_plan AS br ON br.rate_plan_id = pr.rate_plan_id\n" +
+                    "LEFT JOIN benefits AS be ON be.benefit_id = br.benefit_id";
+
+    public static final String COUNT_HIGH_RATING_HOTEL =
+            "SELECT COUNT(DISTINCT h.hotel_id)\n" +
+            "FROM hotel AS h\n" +
+            "JOIN city AS c ON h.id_city = c.city_id\n" +
+            "JOIN \n" +
+            "(SELECT r.hotel_id,\n" +
+            "   ROW_NUMBER() OVER (\n" +
+            "   PARTITION BY r.hotel_id\n" +
+            "   ORDER BY COUNT(br.booking_id) DESC\n" +
+            "   ) AS rn\n" +
+            "            FROM room AS r\n" +
+            "            JOIN room_rate_plans AS rrp\n" +
+            "                ON rrp.room_id = r.id\n" +
+            "            LEFT JOIN booked_room AS br\n" +
+            "                ON br.room_id = r.id\n" +
+            "            GROUP BY r.hotel_id, r.id\n" +
+            ") AS pr ON pr.hotel_id = h.hotel_id AND pr.rn = 1";
 }

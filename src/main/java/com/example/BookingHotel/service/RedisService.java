@@ -44,4 +44,9 @@ public class RedisService {
     public void delete(String key){
         redisTemplate.delete(key);
     }
+
+    public boolean isTokenBlacklisted(String token){
+        return redisTemplate.hasKey(token);
+    }
+
 }

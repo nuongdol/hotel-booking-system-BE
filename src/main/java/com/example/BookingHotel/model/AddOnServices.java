@@ -1,13 +1,18 @@
 package com.example.BookingHotel.model;
 
 import jakarta.persistence.*;
-import lombok.Cleanup;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 //dịch vu bo sung -tuy chon
 @Entity
 @Table(name = "add_on_services")
+@NoArgsConstructor
+@AllArgsConstructor
 public class AddOnServices {
 
     @Id
@@ -37,7 +42,6 @@ public class AddOnServices {
     @Column(name = "is_active")
     private Integer isActive;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id")
-    private BookedRoom bookedRoom;
+    @ManyToMany(mappedBy = "addOnService")
+    private List<BookedRoom> bookedRoom = new ArrayList<>();
 }

@@ -1,13 +1,20 @@
 package com.example.BookingHotel.controller;
 
 import com.example.BookingHotel.model.Hotel;
+import com.example.BookingHotel.request.HotelDto;
 import com.example.BookingHotel.request.HotelRequest;
 import com.example.BookingHotel.response.ApiResponse;
+import com.example.BookingHotel.response.DetailHotelResponse;
 import com.example.BookingHotel.response.HotelResponse;
 import com.example.BookingHotel.service.HotelService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -73,7 +81,7 @@ public class HotelController {
     }
 
     @PutMapping("/{hotelId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN', 'ROLE_OWNER')")
+    @PreAuthorize("hasRole('ADMIN', 'OWNER')")
     public ResponseEntity<ApiResponse<HotelResponse>> updateHotel(@PathVariable(name = "hotelId") Long hotelId,
                                                                   @RequestParam(required = false, name = "name") String nameHotel,
                                                                   @RequestParam(required = false, name = "address") String addressHotel) {
@@ -89,7 +97,7 @@ public class HotelController {
     }
 
     @PostMapping("/{hotelId}/image")
-    @PreAuthorize("hasRole('ROLE_ADMIN', 'ROLE_OWNER')")
+    @PreAuthorize("hasRole('ADMIN', 'OWNER')")
     public ResponseEntity<ApiResponse<HotelResponse>> uploadImageHotel(@PathVariable(name = "hotelId") Long hotelId,
                                                                        @RequestParam(required = false, name = "image") MultipartFile imageHotel) {
         HotelResponse hotel = hotelService.updateImage(hotelId, imageHotel);
@@ -102,4 +110,23 @@ public class HotelController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+    @Operation(description = "Lấy danh sách khách sạn resort được đánh giá cao")
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<List<DetailHotelResponse>>> getHighRatingHotel(
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size){
+        log.info("--- getHighRatingHotel start.");
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DetailHotelResponse> hotelPage = hotelService.getHighRatingHotel(pageable);
+        log.info("--- getHighRatingHotel end.");
+        ApiResponse<List<DetailHotelResponse>> response = ApiResponse.<List<DetailHotelResponse>>builder()
+                .status("SUCCESS")
+                .data(hotelPage.getContent())
+                .code(HttpStatus.OK.value())
+                .message("Successfully get high rating hotel!")
+                .build();
+        return ResponseEntity.ok().body(response);
+    }
+
 }

@@ -2,7 +2,10 @@ package com.example.BookingHotel.repository;
 
 import com.example.BookingHotel.model.Hotel;
 import com.example.BookingHotel.request.HotelDto;
+import com.example.BookingHotel.response.DetailHotelResponse;
 import com.example.BookingHotel.sql.SQLHotel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,4 +28,7 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
     @Query(nativeQuery = true, value = SQLHotel.GET_DETAIL_HOTEL)
     List<HotelDto> getDetailHotel(@Param("hotelId") Long hotelId);
+
+    @Query(nativeQuery = true, value = SQLHotel.GET_HIGH_RATING_HOTELS_PAGE, countQuery = SQLHotel.COUNT_HIGH_RATING_HOTEL)
+    Page<DetailHotelResponse> getHighRatingHotelsPage(Pageable pageable);
 }

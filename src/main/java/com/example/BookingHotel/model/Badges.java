@@ -1,6 +1,7 @@
 package com.example.BookingHotel.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 @Entity
 @NoArgsConstructor
 @Table(name = "badges")
+@AllArgsConstructor
 //nhan phu cho hotel
 public class Badges {
 
@@ -43,5 +45,4 @@ public class Badges {
             joinColumns = @JoinColumn(name = "badge_id", referencedColumnName = "badge_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "category_id"))
     Collection<Categories> categories = new HashSet<>();
-
 }

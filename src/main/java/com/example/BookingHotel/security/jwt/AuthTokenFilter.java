@@ -1,6 +1,9 @@
 package com.example.BookingHotel.security.jwt;
 
+import com.example.BookingHotel.constant.ResponseCode;
+import com.example.BookingHotel.exception.BusinessException;
 import com.example.BookingHotel.security.User.HotelUserDetailsService;
+import com.example.BookingHotel.service.RedisService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +25,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private RedisService redisService;
 
     @Autowired
     private HotelUserDetailsService userDetailsService;
@@ -33,6 +38,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         try{
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateToken(jwt)){
+                if(redisService.isTokenBlacklisted(jwt)){
+                    throw new BusinessException(ResponseCode.TOKEN_INVALID);
+                }
                 String email = jwtUtils.getUserNameFromToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 var authentication =

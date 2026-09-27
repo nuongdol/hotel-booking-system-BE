@@ -11,10 +11,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
@@ -128,4 +125,11 @@ public class BookedRoom {
         this.bookingConfirmationCode = bookingConfirmationCode;
     }
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "booking_services",
+            joinColumns = @JoinColumn(name = "booking_id", referencedColumnName = "booking_id"),
+            inverseJoinColumns = @JoinColumn(name = "add_on_service_id", referencedColumnName = "add_on_service_id")
+    )
+    private Collection<AddOnServices> addOnService = new ArrayList<>();
 }

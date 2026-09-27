@@ -11,11 +11,14 @@ import com.example.BookingHotel.repository.HotelRepository;
 import com.example.BookingHotel.repository.RoomRepository;
 import com.example.BookingHotel.request.HotelDto;
 import com.example.BookingHotel.request.HotelRequest;
+import com.example.BookingHotel.response.DetailHotelResponse;
 import com.example.BookingHotel.response.HotelResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -199,6 +202,15 @@ public class HotelService implements IHotelService {
             log.error("File processing error for hotel ID: {}", hotelId, ex);
             throw new BusinessException(ResponseCode.FILE_PROCESSING_ERROR);
         }
+    }
+
+    @Override
+    public Page<DetailHotelResponse> getHighRatingHotel(Pageable pageable) {
+        Page<DetailHotelResponse> hotelDtoPage = hotelRepository.getHighRatingHotelsPage(pageable);
+        if(hotelDtoPage.isEmpty()){
+            throw new BusinessException(ResponseCode.LIST_HOTEL_IS_EMPTY);
+        }
+        return hotelDtoPage;
     }
 
     private String convertBlobToStringTypeOfImage(Blob imageHotel) {

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -51,4 +52,7 @@ public class RoomRatePlans {
 
     @OneToMany(mappedBy = "roomRatePlans", cascade = CascadeType.ALL)
     private List<Promotions> promotions;
+
+    @ManyToMany(mappedBy = "roomRatePlans")
+    private List<Benefits> benefits = new ArrayList<>();
 }
