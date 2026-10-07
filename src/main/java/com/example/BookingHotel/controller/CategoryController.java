@@ -2,6 +2,7 @@ package com.example.BookingHotel.controller;
 
 
 import com.example.BookingHotel.response.ApiResponse;
+import com.example.BookingHotel.response.CategoryDto;
 import com.example.BookingHotel.response.CategoryResponse;
 import com.example.BookingHotel.service.ICategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,11 +26,11 @@ public class CategoryController {
 
     @GetMapping("")
     @Operation(description = "Hiển thị danh sách categories của hotel-booking")
-    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getLstCategories(){
+    public ResponseEntity<ApiResponse<List<CategoryDto>>> getLstCategories(){
         log.info("-- Execute getLstCategories method: Start--");
-        List<CategoryResponse> categoryResponse = categoryService.getLstCategories();
+        List<CategoryDto> categoryResponse = categoryService.getLstCategories();
         log.info("-- Execute getLstCategories method: End--");
-        ApiResponse<List<CategoryResponse>> response = ApiResponse.<List<CategoryResponse>> builder()
+        ApiResponse<List<CategoryDto>> response = ApiResponse.<List<CategoryDto>> builder()
                 .status("SUCCESS")
                 .data(categoryResponse)
                 .code(HttpStatus.CREATED.value())

@@ -2,7 +2,6 @@ package com.example.BookingHotel.response;
 
 import com.example.BookingHotel.model.Badges;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

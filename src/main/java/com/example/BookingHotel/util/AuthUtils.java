@@ -17,6 +17,7 @@ public class AuthUtils {
                 || securityContext.getAuthentication().getPrincipal() == null) {
             return null;
         }
+        //kiểm tra user có phải là anonymousUser không
         Object principal = securityContext.getAuthentication().getPrincipal();
         if (principal instanceof String && principal.equals("anonymousUser")) {
             return null;
